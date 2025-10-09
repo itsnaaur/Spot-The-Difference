@@ -69,6 +69,8 @@ Spot-The-Difference/
 
 ## 🚀 Getting Started
 
+> **📖 For detailed run instructions, see [HOW_TO_RUN.md](HOW_TO_RUN.md)**
+
 ### Prerequisites
 
 - **Java Development Kit (JDK) 11 or higher**
