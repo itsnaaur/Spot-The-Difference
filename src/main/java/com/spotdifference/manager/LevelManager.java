@@ -1,8 +1,9 @@
 package com.spotdifference.manager;
 
-import com.spotdifference.model.LevelData;
 import java.util.HashMap;
 import java.util.Set;
+
+import com.spotdifference.model.LevelData;
 
 /**
  * Function 1: Level Management and Selection
@@ -24,14 +25,15 @@ public class LevelManager {
     private void initializeLevels() {
         // Level 1: Beach Scene (Easy)
         LevelData beach = new LevelData("Beach Scene", 
-            "resources/images/beach1.jpg", 
-            "resources/images/beach2.jpg", 
+            "images/beach1.png", 
+            "images/beach2.png", 
             1);
-        beach.addDifference(150, 200, 30);
-        beach.addDifference(300, 150, 25);
-        beach.addDifference(450, 300, 30);
-        beach.addDifference(200, 400, 25);
-        beach.addDifference(500, 250, 30);
+        // Coordinates found using Coordinate Finder Tool
+        beach.addDifference(275, 356, 30);  // Difference 1
+        beach.addDifference(324, 445, 30);  // Difference 2
+        beach.addDifference(55, 297, 30);   // Difference 3
+        beach.addDifference(485, 312, 30);  // Difference 4
+        beach.addDifference(85, 403, 30);   // Difference 5
         levels.put("Beach Scene", beach);
         
         // Level 2: Jungle Scene (Medium)

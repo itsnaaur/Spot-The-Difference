@@ -9,6 +9,7 @@ import com.spotdifference.model.Difference;
 import com.spotdifference.model.LevelData;
 import com.spotdifference.model.PlayerScore;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -441,9 +442,28 @@ public class GameScreen extends JFrame {
         public ImagePanel(String imagePath, boolean isLeftImage) {
             this.isLeftImage = isLeftImage;
             this.markers = new ArrayList<>();
-            this.image = createPlaceholderImage();
+            this.image = loadImage(imagePath);
             setBackground(Color.WHITE);
             setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        }
+        
+        private BufferedImage loadImage(String imagePath) {
+            try {
+                // Try to load the image from the classpath
+                java.io.InputStream inputStream = getClass().getClassLoader().getResourceAsStream(imagePath);
+                if (inputStream != null) {
+                    BufferedImage img = ImageIO.read(inputStream);
+                    inputStream.close();
+                    if (img != null) {
+                        return img;
+                    }
+                }
+                System.out.println("Could not load image: " + imagePath);
+            } catch (Exception e) {
+                System.err.println("Error loading image " + imagePath + ": " + e.getMessage());
+            }
+            // Fall back to placeholder if image loading fails
+            return createPlaceholderImage();
         }
         
         private BufferedImage createPlaceholderImage() {
