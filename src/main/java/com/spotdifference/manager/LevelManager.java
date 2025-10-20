@@ -38,16 +38,17 @@ public class LevelManager {
         
         // Level 2: Jungle Scene (Medium)
         LevelData jungle = new LevelData("Jungle Scene", 
-            "resources/images/jungle1.jpg", 
-            "resources/images/jungle2.jpg", 
+            "images/jungle1.png", 
+            "images/jungle2.png", 
             2);
-        jungle.addDifference(180, 220, 25);
-        jungle.addDifference(320, 180, 30);
-        jungle.addDifference(250, 350, 25);
-        jungle.addDifference(420, 280, 30);
-        jungle.addDifference(150, 450, 25);
-        jungle.addDifference(480, 400, 30);
-        jungle.addDifference(350, 150, 25);
+        // Coordinates found using Coordinate Finder Tool
+        jungle.addDifference(540, 299, 30);  // Difference 1
+        jungle.addDifference(250, 171, 30);  // Difference 2
+        jungle.addDifference(413, 215, 30);  // Difference 3
+        jungle.addDifference(474, 474, 30);  // Difference 4
+        jungle.addDifference(83, 181, 30);   // Difference 5
+        jungle.addDifference(55, 96, 30);    // Difference 6
+        jungle.addDifference(445, 87, 30);   // Difference 7
         levels.put("Jungle Scene", jungle);
         
         // Level 3: City Scene (Hard)
