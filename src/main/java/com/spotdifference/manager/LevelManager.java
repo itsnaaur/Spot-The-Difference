@@ -51,21 +51,23 @@ public class LevelManager {
         jungle.addDifference(445, 87, 30);   // Difference 7
         levels.put("Jungle Scene", jungle);
         
-        // Level 3: City Scene (Hard)
+        // Level 3: City Scene (Hard) - 10 differences
         LevelData city = new LevelData("City Scene", 
-            "resources/images/city1.jpg", 
-            "resources/images/city2.jpg", 
+            "images/city1.png", 
+            "images/city2.png", 
             3);
-        city.addDifference(200, 150, 20);
-        city.addDifference(350, 250, 25);
-        city.addDifference(180, 380, 20);
-        city.addDifference(450, 200, 25);
-        city.addDifference(280, 320, 20);
-        city.addDifference(400, 420, 25);
-        city.addDifference(150, 280, 20);
-        city.addDifference(500, 350, 25);
-        city.addDifference(250, 180, 20);
-        city.addDifference(380, 450, 25);
+        // Coordinates found using Coordinate Finder Tool
+        // Alternating 20px and 25px for progressive difficulty
+        city.addDifference(78, 446, 20);    // Difference 1 - harder (20px)
+        city.addDifference(510, 458, 25);   // Difference 2 - easier (25px)
+        city.addDifference(83, 364, 20);    // Difference 3 - harder (20px)
+        city.addDifference(34, 375, 25);    // Difference 4 - easier (25px)
+        city.addDifference(42, 35, 20);     // Difference 5 - harder (20px)
+        city.addDifference(122, 23, 25);    // Difference 6 - easier (25px)
+        city.addDifference(498, 124, 20);   // Difference 7 - harder (20px)
+        city.addDifference(293, 128, 25);   // Difference 8 - easier (25px)
+        city.addDifference(418, 218, 20);   // Difference 9 - harder (20px)
+        city.addDifference(516, 174, 25);   // Difference 10 - easier (25px)
         levels.put("City Scene", city);
         
         // Level 4: Space Scene (Expert)
