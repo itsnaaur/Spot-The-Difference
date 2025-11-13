@@ -29,11 +29,11 @@ public class LevelManager {
             "images/beach2.png", 
             1);
         // Coordinates found using Coordinate Finder Tool
-        beach.addDifference(275, 356, 30);  // Difference 1
-        beach.addDifference(324, 445, 30);  // Difference 2
-        beach.addDifference(55, 297, 30);   // Difference 3
-        beach.addDifference(485, 312, 30);  // Difference 4
-        beach.addDifference(85, 403, 30);   // Difference 5
+        beach.addDifference(275, 356, 20);  // Difference 1 - Easy difficulty
+        beach.addDifference(324, 445, 20);  // Difference 2
+        beach.addDifference(55, 297, 20);   // Difference 3
+        beach.addDifference(485, 312, 20);  // Difference 4
+        beach.addDifference(85, 403, 20);   // Difference 5
         levels.put("Beach Scene", beach);
         
         // Level 2: Jungle Scene (Medium)
@@ -42,13 +42,13 @@ public class LevelManager {
             "images/jungle2.png", 
             2);
         // Coordinates found using Coordinate Finder Tool
-        jungle.addDifference(540, 299, 30);  // Difference 1
-        jungle.addDifference(250, 171, 30);  // Difference 2
-        jungle.addDifference(413, 215, 30);  // Difference 3
-        jungle.addDifference(474, 474, 30);  // Difference 4
-        jungle.addDifference(83, 181, 30);   // Difference 5
-        jungle.addDifference(55, 96, 30);    // Difference 6
-        jungle.addDifference(445, 87, 30);   // Difference 7
+        jungle.addDifference(540, 299, 18);  // Difference 1 - Medium difficulty
+        jungle.addDifference(250, 171, 18);  // Difference 2
+        jungle.addDifference(413, 215, 18);  // Difference 3
+        jungle.addDifference(474, 474, 18);  // Difference 4
+        jungle.addDifference(83, 181, 18);   // Difference 5
+        jungle.addDifference(55, 96, 18);    // Difference 6
+        jungle.addDifference(445, 87, 18);   // Difference 7
         levels.put("Jungle Scene", jungle);
         
         // Level 3: City Scene (Hard) - 10 differences
@@ -57,58 +57,62 @@ public class LevelManager {
             "images/city2.png", 
             3);
         // Coordinates found using Coordinate Finder Tool
-        // Alternating 20px and 25px for progressive difficulty
-        city.addDifference(78, 446, 20);    // Difference 1 - harder (20px)
-        city.addDifference(510, 458, 25);   // Difference 2 - easier (25px)
-        city.addDifference(83, 364, 20);    // Difference 3 - harder (20px)
-        city.addDifference(34, 375, 25);    // Difference 4 - easier (25px)
-        city.addDifference(42, 35, 20);     // Difference 5 - harder (20px)
-        city.addDifference(122, 23, 25);    // Difference 6 - easier (25px)
-        city.addDifference(498, 124, 20);   // Difference 7 - harder (20px)
-        city.addDifference(293, 128, 25);   // Difference 8 - easier (25px)
-        city.addDifference(418, 218, 20);   // Difference 9 - harder (20px)
-        city.addDifference(516, 174, 25);   // Difference 10 - easier (25px)
+        // All 15px for Hard difficulty (smaller targets!)
+        city.addDifference(78, 446, 15);    // Difference 1
+        city.addDifference(510, 458, 15);   // Difference 2
+        city.addDifference(83, 364, 15);    // Difference 3
+        city.addDifference(34, 375, 15);    // Difference 4
+        city.addDifference(42, 35, 15);     // Difference 5
+        city.addDifference(122, 23, 15);    // Difference 6
+        city.addDifference(498, 124, 15);   // Difference 7
+        city.addDifference(293, 128, 15);   // Difference 8
+        city.addDifference(418, 218, 15);   // Difference 9
+        city.addDifference(516, 174, 15);   // Difference 10
         levels.put("City Scene", city);
         
-        // Level 4: Space Scene (Expert)
+        // Level 4: Space Scene (Expert) - 12 differences
         LevelData space = new LevelData("Space Scene", 
-            "resources/images/space1.jpg", 
-            "resources/images/space2.jpg", 
+            "images/space1.png", 
+            "images/space2.png", 
             4);
-        space.addDifference(190, 210, 20);
-        space.addDifference(330, 160, 25);
-        space.addDifference(220, 370, 20);
-        space.addDifference(470, 240, 25);
-        space.addDifference(160, 420, 20);
-        space.addDifference(390, 330, 25);
-        space.addDifference(280, 190, 20);
-        space.addDifference(420, 450, 25);
-        space.addDifference(240, 280, 20);
-        space.addDifference(500, 380, 25);
-        space.addDifference(170, 340, 20);
-        space.addDifference(450, 170, 25);
+        // Coordinates found using Coordinate Finder Tool
+        // All 12px for Expert difficulty (very small targets!)
+        space.addDifference(538, 292, 12);   // Difference 1
+        space.addDifference(419, 412, 12);   // Difference 2
+        space.addDifference(76, 311, 12);    // Difference 3
+        space.addDifference(61, 149, 12);    // Difference 4
+        space.addDifference(17, 457, 12);    // Difference 5
+        space.addDifference(353, 60, 12);    // Difference 6
+        space.addDifference(526, 73, 12);    // Difference 7
+        space.addDifference(474, 29, 12);    // Difference 8
+        space.addDifference(541, 191, 12);   // Difference 9
+        space.addDifference(40, 58, 12);     // Difference 10
+        space.addDifference(102, 80, 12);    // Difference 11
+        space.addDifference(103, 379, 12);   // Difference 12
         levels.put("Space Scene", space);
         
-        // Level 5: Fantasy Scene (Master)
+        // Level 5: Fantasy Scene (Master) - 15 differences
         LevelData fantasy = new LevelData("Fantasy Scene", 
-            "resources/images/fantasy1.jpg", 
-            "resources/images/fantasy2.jpg", 
+            "images/fantasy1.png", 
+            "images/fantasy2.png", 
             5);
-        fantasy.addDifference(210, 190, 18);
-        fantasy.addDifference(340, 240, 22);
-        fantasy.addDifference(180, 360, 18);
-        fantasy.addDifference(460, 210, 22);
-        fantasy.addDifference(270, 310, 18);
-        fantasy.addDifference(410, 410, 22);
-        fantasy.addDifference(160, 270, 18);
-        fantasy.addDifference(490, 340, 22);
-        fantasy.addDifference(240, 170, 18);
-        fantasy.addDifference(370, 440, 22);
-        fantasy.addDifference(200, 420, 18);
-        fantasy.addDifference(440, 180, 22);
-        fantasy.addDifference(320, 290, 18);
-        fantasy.addDifference(480, 250, 22);
-        fantasy.addDifference(150, 380, 18);
+        // Coordinates found using Coordinate Finder Tool
+        // All 10px for Master difficulty (EXTREME precision required!)
+        fantasy.addDifference(403, 339, 10);  // Difference 1 - EXTREME!
+        fantasy.addDifference(520, 259, 10);  // Difference 2
+        fantasy.addDifference(496, 164, 10);  // Difference 3
+        fantasy.addDifference(497, 119, 10);  // Difference 4
+        fantasy.addDifference(385, 21, 10);   // Difference 5
+        fantasy.addDifference(330, 82, 10);   // Difference 6
+        fantasy.addDifference(332, 209, 10);  // Difference 7
+        fantasy.addDifference(179, 175, 10);  // Difference 8
+        fantasy.addDifference(91, 165, 10);   // Difference 9
+        fantasy.addDifference(60, 96, 10);    // Difference 10
+        fantasy.addDifference(49, 156, 10);   // Difference 11
+        fantasy.addDifference(61, 353, 10);   // Difference 12
+        fantasy.addDifference(77, 390, 10);   // Difference 13
+        fantasy.addDifference(186, 419, 10);  // Difference 14
+        fantasy.addDifference(238, 227, 10);  // Difference 15
         levels.put("Fantasy Scene", fantasy);
     }
     
