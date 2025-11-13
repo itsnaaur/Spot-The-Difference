@@ -45,40 +45,45 @@ public class HighScoresFrame extends JFrame {
     
     private void createComponents() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 250));
+        mainPanel.setBackground(new Color(248, 250, 252));
         
-        // Header
+        // Modern Header
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(255, 165, 0));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        headerPanel.setBackground(new Color(234, 179, 8));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
         
-        JLabel titleLabel = new JLabel("🏆 High Scores 🏆");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        JLabel titleLabel = new JLabel("High Scores Leaderboard");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
         
         // Table for scores
         JPanel tablePanel = createScoresTable();
         
-        // Bottom panel
+        // Modern bottom panel
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setBackground(new Color(230, 230, 250));
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        bottomPanel.setBackground(new Color(241, 245, 249));
+        bottomPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(226, 232, 240)),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
         
         JButton backButton = new JButton("← Back to Main Menu");
-        backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setBackground(new Color(120, 120, 120));
+        backButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        backButton.setBackground(new Color(100, 116, 139));
         backButton.setForeground(Color.WHITE);
         backButton.setFocusPainted(false);
         backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.setBorder(BorderFactory.createEmptyBorder(12, 24, 12, 24));
         backButton.addActionListener(e -> returnToMainMenu());
         
         JButton clearButton = new JButton("Clear All Scores");
-        clearButton.setFont(new Font("Arial", Font.BOLD, 14));
-        clearButton.setBackground(new Color(244, 67, 54));
+        clearButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        clearButton.setBackground(new Color(239, 68, 68));
         clearButton.setForeground(Color.WHITE);
         clearButton.setFocusPainted(false);
         clearButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        clearButton.setBorder(BorderFactory.createEmptyBorder(12, 24, 12, 24));
         clearButton.addActionListener(e -> clearScores());
         
         bottomPanel.add(backButton);
@@ -94,8 +99,8 @@ public class HighScoresFrame extends JFrame {
     
     private JPanel createScoresTable() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+        panel.setBackground(new Color(255, 255, 255));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
         
         // Column names
         String[] columnNames = {"Rank", "Player", "Score", "Level", "Date"};
@@ -135,14 +140,15 @@ public class HighScoresFrame extends JFrame {
             rank++;
         }
         
-        // Create table
+        // Create modern table
         JTable table = new JTable(model);
-        table.setFont(new Font("Arial", Font.PLAIN, 14));
-        table.setRowHeight(35);
-        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(63, 81, 181));
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setRowHeight(40);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(37, 99, 235));
         table.getTableHeader().setForeground(Color.WHITE);
-        table.setSelectionBackground(new Color(197, 202, 233));
+        table.setSelectionBackground(new Color(219, 234, 254));
+        table.setGridColor(new Color(226, 232, 240));
         
         // Center align all cells
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();

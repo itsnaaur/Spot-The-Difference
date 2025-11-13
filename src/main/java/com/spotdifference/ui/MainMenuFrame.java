@@ -27,25 +27,25 @@ public class MainMenuFrame extends JFrame {
     private void createComponents() {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(new Color(240, 248, 255));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(50, 80, 50, 80));
+        mainPanel.setBackground(new Color(250, 250, 252));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(60, 80, 60, 80));
         
-        // Title
+        // Title with modern styling
         JLabel titleLabel = new JLabel("Spot the Difference");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
-        titleLabel.setForeground(new Color(0, 102, 204));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 42));
+        titleLabel.setForeground(new Color(37, 99, 235));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Subtitle
+        // Subtitle with modern font
         JLabel subtitleLabel = new JLabel("Data Structures Showcase Game");
-        subtitleLabel.setFont(new Font("Arial", Font.ITALIC, 16));
-        subtitleLabel.setForeground(new Color(100, 100, 100));
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        subtitleLabel.setForeground(new Color(100, 116, 139));
         subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Buttons
-        JButton startButton = createStyledButton("Start Game", new Color(76, 175, 80));
-        JButton highScoresButton = createStyledButton("High Scores", new Color(33, 150, 243));
-        JButton exitButton = createStyledButton("Exit", new Color(244, 67, 54));
+        // Modern buttons with text icons
+        JButton startButton = createStyledButton("▶ Start Game", new Color(34, 197, 94));
+        JButton highScoresButton = createStyledButton("★ High Scores", new Color(59, 130, 246));
+        JButton exitButton = createStyledButton("✕ Exit", new Color(239, 68, 68));
         
         // Button actions
         startButton.addActionListener(e -> openLevelSelection());
@@ -63,50 +63,56 @@ public class MainMenuFrame extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         mainPanel.add(exitButton);
         
-        // Add info panel at bottom
-        JPanel infoPanel = createInfoPanel();
-        
         add(mainPanel, BorderLayout.CENTER);
-        add(infoPanel, BorderLayout.SOUTH);
     }
     
     private JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 18));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 16));
         button.setBackground(bgColor);
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(300, 50));
+        button.setMaximumSize(new Dimension(320, 55));
+        button.setPreferredSize(new Dimension(320, 55));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setOpaque(true);
         
-        // Hover effect
+        // Modern rounded corners
+        button.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(5, 5, 5, 5),
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bgColor.darker(), 0, true),
+                BorderFactory.createEmptyBorder(12, 25, 12, 25)
+            )
+        ));
+        
+        // Smooth hover effect with shadow
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor.darker());
+                button.setBackground(bgColor.brighter());
+                button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(0, 0, 0, 30), 2, true),
+                    BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(bgColor, 0, true),
+                        BorderFactory.createEmptyBorder(12, 25, 12, 25)
+                    )
+                ));
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(bgColor);
+                button.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                    BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(bgColor.darker(), 0, true),
+                        BorderFactory.createEmptyBorder(12, 25, 12, 25)
+                    )
+                ));
             }
         });
         
         return button;
-    }
-    
-    private JPanel createInfoPanel() {
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(230, 230, 250));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
-        
-        JLabel infoLabel = new JLabel("<html><center>" +
-            "Data Structures Used: HashMap • HashSet • Stack • Queue • LinkedList • Graph" +
-            "</center></html>");
-        infoLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-        infoLabel.setForeground(new Color(80, 80, 80));
-        
-        panel.add(infoLabel);
-        return panel;
     }
     
     private void openLevelSelection() {

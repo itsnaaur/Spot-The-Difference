@@ -119,37 +119,37 @@ public class GameScreen extends JFrame {
     
     private JPanel createTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(63, 81, 181));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        panel.setBackground(new Color(37, 99, 235));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
         
-        // Left: Level name
-        JLabel levelLabel = new JLabel(levelName);
-        levelLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        // Left: Level name with modern styling
+        JLabel levelLabel = new JLabel("Playing: " + levelName);
+        levelLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         levelLabel.setForeground(Color.WHITE);
         
         // Center: Action buttons
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setOpaque(false);
         
-        hintButton = createGameButton("💡 Hint (" + hintManager.getHintsRemaining() + ")", 
-                                      new Color(255, 165, 0));
+        hintButton = createGameButton("Hint (" + hintManager.getHintsRemaining() + ")", 
+                                      new Color(234, 179, 8));
         hintButton.addActionListener(e -> useHint());
         
-        undoButton = createGameButton("↶ Undo", new Color(156, 39, 176));
+        undoButton = createGameButton("Undo", new Color(168, 85, 247));
         undoButton.addActionListener(e -> undoLastMove());
         undoButton.setEnabled(false);
         
-        JButton pauseButton = createGameButton("⏸ Pause", new Color(96, 125, 139));
+        JButton pauseButton = createGameButton("Pause", new Color(100, 116, 139));
         pauseButton.addActionListener(e -> pauseGame());
         
         buttonPanel.add(hintButton);
         buttonPanel.add(undoButton);
         buttonPanel.add(pauseButton);
         
-        // Right: Differences remaining
-        differencesLabel = new JLabel(differenceChecker.getRemainingCount() + " left");
-        differencesLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        differencesLabel.setForeground(Color.YELLOW);
+        // Right: Differences remaining with modern badge
+        differencesLabel = new JLabel(differenceChecker.getRemainingCount() + " remaining");
+        differencesLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        differencesLabel.setForeground(new Color(253, 224, 71));
         
         panel.add(levelLabel, BorderLayout.WEST);
         panel.add(buttonPanel, BorderLayout.CENTER);
@@ -179,17 +179,21 @@ public class GameScreen extends JFrame {
     }
     
     private JPanel createBottomPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 10));
-        panel.setBackground(new Color(230, 230, 250));
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 15));
+        panel.setBackground(new Color(241, 245, 249));
+        panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(226, 232, 240)));
         
         scoreLabel = new JLabel("Score: 0");
-        scoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        scoreLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        scoreLabel.setForeground(new Color(37, 99, 235));
         
         timeLabel = new JLabel("Time: 00:00");
-        timeLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        timeLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        timeLabel.setForeground(new Color(100, 116, 139));
         
         clicksLabel = new JLabel("Clicks: 0");
-        clicksLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        clicksLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        clicksLabel.setForeground(new Color(100, 116, 139));
         
         panel.add(scoreLabel);
         panel.add(timeLabel);
@@ -200,11 +204,23 @@ public class GameScreen extends JFrame {
     
     private JButton createGameButton(String text, Color bgColor) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.BOLD, 13));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
         button.setBackground(bgColor);
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+        
+        // Modern hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(bgColor.brighter());
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(bgColor);
+            }
+        });
+        
         return button;
     }
     
@@ -262,7 +278,7 @@ public class GameScreen extends JFrame {
         updateScore();
         
         // Update UI
-        differencesLabel.setText(differenceChecker.getRemainingCount() + " left");
+        differencesLabel.setText(differenceChecker.getRemainingCount() + " remaining");
         
         // Check if level complete
         if (differenceChecker.isLevelComplete()) {
@@ -288,7 +304,7 @@ public class GameScreen extends JFrame {
             rightImagePanel.showHint(currentHint.getLocation());
             
             // Update button
-            hintButton.setText("💡 Hint (" + hintManager.getHintsRemaining() + ")");
+            hintButton.setText("Hint (" + hintManager.getHintsRemaining() + ")");
             if (!hintManager.hasHintsAvailable()) {
                 hintButton.setEnabled(false);
             }
@@ -327,7 +343,7 @@ public class GameScreen extends JFrame {
             rightImagePanel.removeMarker(lastDiff.getLocation());
             
             // Update UI
-            differencesLabel.setText(differenceChecker.getRemainingCount() + " left");
+            differencesLabel.setText(differenceChecker.getRemainingCount() + " remaining");
             
             // Score penalty for undo
             score = Math.max(0, score - 50);
@@ -388,7 +404,7 @@ public class GameScreen extends JFrame {
         
         // Show completion dialog
         String message = String.format(
-            "🎉 Level Complete! 🎉\n\n" +
+            "=== Level Complete! ===\n\n" +
             "Final Score: %d\n" +
             "Time: %d seconds\n" +
             "Time Bonus: +%d\n\n" +
