@@ -1,12 +1,17 @@
 package com.spotdifference.ui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -30,9 +35,9 @@ public class LevelSelectionFrame extends JFrame {
     private static final int WINDOW_WIDTH = 800;
     private static final int WINDOW_HEIGHT = 600;
     
-    private JFrame parentFrame;
-    private LevelManager levelManager;
-    private LevelProgressionGraph progressionGraph;
+    private final JFrame parentFrame;
+    private final LevelManager levelManager;
+    private final LevelProgressionGraph progressionGraph;
     
     public LevelSelectionFrame(JFrame parentFrame) {
         this.parentFrame = parentFrame;
@@ -60,22 +65,38 @@ public class LevelSelectionFrame extends JFrame {
     
     private void createComponents() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(248, 250, 252));
+        mainPanel.setBackground(UITheme.GRAY_50);
         
         // Modern Header with gradient effect
-        JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(37, 99, 235));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
+        JPanel headerPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                GradientPaint gradient = UITheme.createGradient(
+                    getWidth(), getHeight(),
+                    UITheme.PRIMARY_BLUE,
+                    UITheme.PRIMARY_BLUE_DARK
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
+            }
+        };
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(35, 30, 35, 30));
         
         JLabel titleLabel = new JLabel("Choose Your Level");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        titleLabel.setFont(UITheme.getTitleFont(36));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
         
         // Modern level grid panel
-        JPanel levelsPanel = new JPanel(new GridLayout(0, 2, 25, 25));
-        levelsPanel.setBackground(new Color(248, 250, 252));
-        levelsPanel.setBorder(BorderFactory.createEmptyBorder(40, 50, 40, 50));
+        JPanel levelsPanel = new JPanel(new GridLayout(0, 2, 30, 30));
+        levelsPanel.setBackground(UITheme.GRAY_50);
+        levelsPanel.setBorder(BorderFactory.createEmptyBorder(50, 60, 50, 60));
         
         // Get all levels and create buttons
         List<String> unlockedLevels = progressionGraph.getUnlockedLevels();
@@ -96,19 +117,14 @@ public class LevelSelectionFrame extends JFrame {
         
         // Modern bottom panel with back button
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setBackground(new Color(241, 245, 249));
+        bottomPanel.setBackground(UITheme.GRAY_100);
         bottomPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(226, 232, 240)),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            BorderFactory.createMatteBorder(1, 0, 0, 0, UITheme.GRAY_200),
+            BorderFactory.createEmptyBorder(25, 25, 25, 25)
         ));
         
         JButton backButton = new JButton("← Back to Main Menu");
-        backButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        backButton.setBackground(new Color(100, 116, 139));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFocusPainted(false);
-        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        backButton.setBorder(BorderFactory.createEmptyBorder(12, 24, 12, 24));
+        UITheme.styleModernButton(backButton, UITheme.GRAY_500, 45);
         backButton.addActionListener(e -> returnToMainMenu());
         
         bottomPanel.add(backButton);
@@ -121,98 +137,171 @@ public class LevelSelectionFrame extends JFrame {
     }
     
     private JPanel createLevelCard(String levelName, LevelData levelData, boolean unlocked, boolean completed) {
-        JPanel card = new JPanel();
+        JPanel card = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Draw shadow
+                UITheme.drawShadow(g2d, 2, 2, getWidth() - 4, getHeight() - 4, 4);
+                
+                // Draw card background
+                g2d.setColor(getBackground());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
+                
+                // Draw border
+                g2d.setStroke(new BasicStroke(1.5f));
+                Color borderColor = unlocked ? (completed ? UITheme.SUCCESS_GREEN : UITheme.PRIMARY_BLUE_LIGHT) : UITheme.GRAY_200;
+                g2d.setColor(borderColor);
+                g2d.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 16, 16);
+                
+                g2d.dispose();
+            }
+        };
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Color.WHITE);
-        
-        // Modern card with shadow effect
-        card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(226, 232, 240), 1, true),
-                BorderFactory.createLineBorder(new Color(241, 245, 249), 3, true)
-            ),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        ));
+        card.setBackground(UITheme.BG_CARD);
+        card.setOpaque(false);
+        card.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
         
         // Level name with modern font
         JLabel nameLabel = new JLabel(levelName);
-        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        nameLabel.setFont(UITheme.getHeadingFont(22));
+        nameLabel.setForeground(UITheme.TEXT_PRIMARY);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Level difficulty rating - using text instead of stars
         String[] difficultyText = {"Easy", "Medium", "Hard", "Expert", "Master"};
-        String difficultyRating = "Difficulty: " + difficultyText[levelData.getDifficulty() - 1];
-        JLabel difficultyLabel = new JLabel(difficultyRating);
-        difficultyLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        difficultyLabel.setForeground(new Color(234, 179, 8));
+        Color[] difficultyColors = {
+            UITheme.SUCCESS_GREEN,
+            UITheme.WARNING_YELLOW,
+            new Color(255, 152, 0),
+            new Color(255, 87, 34),
+            UITheme.DANGER_RED
+        };
+        String difficultyRating = difficultyText[levelData.getDifficulty() - 1];
+        JLabel difficultyLabel = new JLabel("Difficulty: " + difficultyRating);
+        difficultyLabel.setFont(UITheme.getButtonFont(13));
+        difficultyLabel.setForeground(difficultyColors[levelData.getDifficulty() - 1]);
         difficultyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         JLabel differencesLabel = new JLabel(levelData.getTotalDifferences() + " differences to find");
-        differencesLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        differencesLabel.setForeground(new Color(100, 116, 139));
+        differencesLabel.setFont(UITheme.getBodyFont(12));
+        differencesLabel.setForeground(UITheme.TEXT_SECONDARY);
         differencesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         // Modern status label with badge styling
-        JLabel statusLabel = new JLabel();
-        statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        JLabel statusLabel = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Draw rounded badge background
+                g2d.setColor(getBackground());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                
+                // Draw text
+                g2d.setColor(getForeground());
+                FontMetrics fm = g2d.getFontMetrics(getFont());
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX, textY);
+                
+                g2d.dispose();
+            }
+        };
+        statusLabel.setFont(UITheme.getButtonFont(10));
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setOpaque(true);
-        statusLabel.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
+        statusLabel.setOpaque(false);
+        statusLabel.setPreferredSize(new Dimension(120, 28));
         
         if (completed) {
             statusLabel.setText("✓ COMPLETED");
             statusLabel.setForeground(Color.WHITE);
-            statusLabel.setBackground(new Color(34, 197, 94));
+            statusLabel.setBackground(UITheme.SUCCESS_GREEN);
         } else if (unlocked) {
             statusLabel.setText("READY TO PLAY");
             statusLabel.setForeground(Color.WHITE);
-            statusLabel.setBackground(new Color(59, 130, 246));
+            statusLabel.setBackground(UITheme.PRIMARY_BLUE);
         } else {
-            statusLabel.setText("LOCKED");
+            statusLabel.setText("🔒 LOCKED");
             statusLabel.setForeground(Color.WHITE);
-            statusLabel.setBackground(new Color(148, 163, 184));
+            statusLabel.setBackground(UITheme.GRAY_400);
         }
         
         // Modern play button
-        JButton playButton = new JButton(unlocked ? "▶ Play Level" : "Locked");
-        playButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        JButton playButton = new JButton(unlocked ? "▶ Play Level" : "🔒 Locked") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Draw button background
+                g2d.setColor(getBackground());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                
+                // Draw text
+                g2d.setColor(getForeground());
+                FontMetrics fm = g2d.getFontMetrics(getFont());
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX, textY);
+                
+                g2d.dispose();
+            }
+        };
+        playButton.setFont(UITheme.getButtonFont(13));
         playButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        playButton.setMaximumSize(new Dimension(180, 42));
-        playButton.setPreferredSize(new Dimension(180, 42));
+        playButton.setMaximumSize(new Dimension(200, 46));
+        playButton.setPreferredSize(new Dimension(200, 46));
         playButton.setEnabled(unlocked);
         playButton.setCursor(unlocked ? new Cursor(Cursor.HAND_CURSOR) : new Cursor(Cursor.DEFAULT_CURSOR));
         playButton.setFocusPainted(false);
-        playButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        playButton.setBorderPainted(false);
+        playButton.setOpaque(false);
         
         if (unlocked) {
-            playButton.setBackground(new Color(34, 197, 94));
+            playButton.setBackground(UITheme.SUCCESS_GREEN);
             playButton.setForeground(Color.WHITE);
             playButton.addActionListener(e -> startLevel(levelName));
             
-            // Hover effect for unlocked button
+            // Enhanced hover effect
             playButton.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
                 public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    playButton.setBackground(new Color(22, 163, 74));
+                    playButton.setBackground(UITheme.SUCCESS_GREEN_DARK);
+                    playButton.repaint();
                 }
+                @Override
                 public void mouseExited(java.awt.event.MouseEvent evt) {
-                    playButton.setBackground(new Color(34, 197, 94));
+                    playButton.setBackground(UITheme.SUCCESS_GREEN);
+                    playButton.repaint();
+                }
+                @Override
+                public void mousePressed(java.awt.event.MouseEvent evt) {
+                    playButton.setBackground(UITheme.darkenColor(UITheme.SUCCESS_GREEN, 0.2f));
+                    playButton.repaint();
                 }
             });
         } else {
-            playButton.setBackground(new Color(203, 213, 225));
-            playButton.setForeground(new Color(100, 116, 139));
+            playButton.setBackground(UITheme.GRAY_200);
+            playButton.setForeground(UITheme.TEXT_DISABLED);
         }
         
-        // Add components
-        card.add(nameLabel);
-        card.add(Box.createRigidArea(new Dimension(0, 10)));
-        card.add(difficultyLabel);
+        // Add components with better spacing
         card.add(Box.createRigidArea(new Dimension(0, 5)));
+        card.add(nameLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 12)));
+        card.add(difficultyLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 8)));
         card.add(differencesLabel);
-        card.add(Box.createRigidArea(new Dimension(0, 10)));
-        card.add(statusLabel);
         card.add(Box.createRigidArea(new Dimension(0, 15)));
+        card.add(statusLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 18)));
         card.add(playButton);
+        card.add(Box.createRigidArea(new Dimension(0, 5)));
         
         return card;
     }

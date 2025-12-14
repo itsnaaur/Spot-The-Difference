@@ -1,5 +1,37 @@
 package com.spotdifference.ui;
 
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+
 import com.spotdifference.logic.DifferenceChecker;
 import com.spotdifference.logic.HintManager;
 import com.spotdifference.logic.UndoManager;
@@ -8,15 +40,6 @@ import com.spotdifference.manager.LevelProgressionGraph;
 import com.spotdifference.model.Difference;
 import com.spotdifference.model.LevelData;
 import com.spotdifference.model.PlayerScore;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Main Game Screen - The core gameplay interface
@@ -28,16 +51,16 @@ public class GameScreen extends JFrame {
     private static final int IMAGE_WIDTH = 550;
     private static final int IMAGE_HEIGHT = 500;
     
-    private LevelSelectionFrame parentFrame;
-    private String levelName;
-    private LevelData levelData;
-    private LevelProgressionGraph progressionGraph;
+    private final LevelSelectionFrame parentFrame;
+    private final String levelName;
+    private final LevelData levelData;
+    private final LevelProgressionGraph progressionGraph;
     
     // Data structure managers
     private DifferenceChecker differenceChecker;
     private UndoManager undoManager;
     private HintManager hintManager;
-    private HighScoreManager highScoreManager;
+    private final HighScoreManager highScoreManager;
     
     // Game state
     private int score;
@@ -99,7 +122,7 @@ public class GameScreen extends JFrame {
     
     private void createComponents() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 250));
+        mainPanel.setBackground(UITheme.BG_PANEL);
         
         // Top panel with level info and controls
         JPanel topPanel = createTopPanel();
@@ -118,28 +141,45 @@ public class GameScreen extends JFrame {
     }
     
     private JPanel createTopPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(37, 99, 235));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                GradientPaint gradient = UITheme.createGradient(
+                    getWidth(), getHeight(),
+                    UITheme.PRIMARY_BLUE,
+                    UITheme.PRIMARY_BLUE_DARK
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
+            }
+        };
+        panel.setLayout(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(22, 30, 22, 30));
         
         // Left: Level name with modern styling
         JLabel levelLabel = new JLabel("Playing: " + levelName);
-        levelLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        levelLabel.setFont(UITheme.getHeadingFont(22));
         levelLabel.setForeground(Color.WHITE);
         
         // Center: Action buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         buttonPanel.setOpaque(false);
         
-        hintButton = createGameButton("Hint (" + hintManager.getHintsRemaining() + ")", 
-                                      new Color(234, 179, 8));
+        hintButton = createGameButton("💡 Hint (" + hintManager.getHintsRemaining() + ")", 
+                                      UITheme.WARNING_YELLOW);
         hintButton.addActionListener(e -> useHint());
         
-        undoButton = createGameButton("Undo", new Color(168, 85, 247));
+        undoButton = createGameButton("↶ Undo", UITheme.ACCENT_PURPLE);
         undoButton.addActionListener(e -> undoLastMove());
         undoButton.setEnabled(false);
         
-        JButton pauseButton = createGameButton("Pause", new Color(100, 116, 139));
+        JButton pauseButton = createGameButton("⏸ Pause", UITheme.GRAY_500);
         pauseButton.addActionListener(e -> pauseGame());
         
         buttonPanel.add(hintButton);
@@ -147,9 +187,35 @@ public class GameScreen extends JFrame {
         buttonPanel.add(pauseButton);
         
         // Right: Differences remaining with modern badge
-        differencesLabel = new JLabel(differenceChecker.getRemainingCount() + " remaining");
-        differencesLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        differencesLabel.setForeground(new Color(253, 224, 71));
+        differencesLabel = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Draw badge background
+                g2d.setColor(UITheme.WARNING_YELLOW_LIGHT);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                
+                // Draw border
+                g2d.setStroke(new BasicStroke(2f));
+                g2d.setColor(UITheme.WARNING_YELLOW);
+                g2d.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 20, 20);
+                
+                // Draw text
+                g2d.setColor(UITheme.TEXT_PRIMARY);
+                FontMetrics fm = g2d.getFontMetrics(getFont());
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX, textY);
+                
+                g2d.dispose();
+            }
+        };
+        differencesLabel.setText(differenceChecker.getRemainingCount() + " remaining");
+        differencesLabel.setFont(UITheme.getButtonFont(16));
+        differencesLabel.setOpaque(false);
+        differencesLabel.setPreferredSize(new Dimension(140, 36));
         
         panel.add(levelLabel, BorderLayout.WEST);
         panel.add(buttonPanel, BorderLayout.CENTER);
@@ -159,8 +225,9 @@ public class GameScreen extends JFrame {
     }
     
     private JPanel createCenterPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        panel.setBackground(new Color(245, 245, 250));
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 25));
+        panel.setBackground(UITheme.BG_PANEL);
+        panel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
         
         // Left image
         leftImagePanel = new ImagePanel(levelData.getImage1Path(), true);
@@ -179,21 +246,16 @@ public class GameScreen extends JFrame {
     }
     
     private JPanel createBottomPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 15));
-        panel.setBackground(new Color(241, 245, 249));
-        panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(226, 232, 240)));
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 60, 18));
+        panel.setBackground(UITheme.GRAY_100);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, UITheme.GRAY_200),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
         
-        scoreLabel = new JLabel("Score: 0");
-        scoreLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        scoreLabel.setForeground(new Color(37, 99, 235));
-        
-        timeLabel = new JLabel("Time: 00:00");
-        timeLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        timeLabel.setForeground(new Color(100, 116, 139));
-        
-        clicksLabel = new JLabel("Clicks: 0");
-        clicksLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        clicksLabel.setForeground(new Color(100, 116, 139));
+        scoreLabel = createStatLabel("Score: 0", UITheme.PRIMARY_BLUE);
+        timeLabel = createStatLabel("Time: 00:00", UITheme.TEXT_SECONDARY);
+        clicksLabel = createStatLabel("Clicks: 0", UITheme.TEXT_SECONDARY);
         
         panel.add(scoreLabel);
         panel.add(timeLabel);
@@ -202,22 +264,75 @@ public class GameScreen extends JFrame {
         return panel;
     }
     
+    private JLabel createStatLabel(String text, Color color) {
+        JLabel label = new JLabel(text);
+        label.setFont(UITheme.getHeadingFont(17));
+        label.setForeground(color);
+        label.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(color, 1, true),
+            BorderFactory.createEmptyBorder(8, 20, 8, 20)
+        ));
+        return label;
+    }
+    
     private JButton createGameButton(String text, Color bgColor) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        button.setBackground(bgColor);
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                if (isEnabled()) {
+                    // Draw shadow
+                    UITheme.drawShadow(g2d, 2, 2, getWidth() - 4, getHeight() - 4, 2);
+                    
+                    // Draw button background
+                    g2d.setColor(getBackground());
+                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                    
+                    // Draw border
+                    g2d.setStroke(new BasicStroke(1.5f));
+                    g2d.setColor(UITheme.darkenColor(getBackground(), 0.1f));
+                    g2d.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 10, 10);
+                } else {
+                    // Disabled state
+                    g2d.setColor(UITheme.GRAY_200);
+                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                }
+                
+                // Draw text
+                g2d.setColor(isEnabled() ? getForeground() : UITheme.TEXT_DISABLED);
+                FontMetrics fm = g2d.getFontMetrics(getFont());
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX, textY);
+                
+                g2d.dispose();
+            }
+        };
         
-        // Modern hover effect
+        UITheme.styleModernButton(button, bgColor, 38);
+        button.setPreferredSize(new Dimension(button.getPreferredSize().width, 38));
+        
+        // Enhanced hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor.brighter());
+                if (button.isEnabled()) {
+                    button.setBackground(UITheme.lightenColor(bgColor, 0.15f));
+                    button.repaint();
+                }
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (button.isEnabled()) {
                 button.setBackground(bgColor);
+                    button.repaint();
+                }
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                if (button.isEnabled()) {
+                    button.setBackground(UITheme.darkenColor(bgColor, 0.15f));
+                    button.repaint();
+                }
             }
         });
         
@@ -402,36 +517,137 @@ public class GameScreen extends JFrame {
         // Mark level as completed in graph
         progressionGraph.completeLevel(levelName);
         
-        // Show completion dialog
-        String message = String.format(
-            "=== Level Complete! ===\n\n" +
-            "Final Score: %d\n" +
-            "Time: %d seconds\n" +
-            "Time Bonus: +%d\n\n" +
-            "New levels may have been unlocked!",
-            score, timeSeconds, timeBonus
-        );
+        // Create custom completion dialog with better styling
+        JDialog completionDialog = createCompletionDialog(timeSeconds, timeBonus);
+        completionDialog.setVisible(true);
+        
+        returnToLevelSelection();
+    }
+    
+    private JDialog createCompletionDialog(long timeSeconds, int timeBonus) {
+        JDialog dialog = new JDialog(this, "Level Complete!", true);
+        dialog.setSize(500, 400);
+        dialog.setLocationRelativeTo(this);
+        dialog.setResizable(false);
+        
+        JPanel mainPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                GradientPaint gradient = UITheme.createGradient(
+                    getWidth(), getHeight(),
+                    UITheme.SUCCESS_GREEN_LIGHT,
+                    UITheme.SUCCESS_GREEN
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
+            }
+        };
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        
+        // Title
+        JLabel titleLabel = new JLabel("🎉 Level Complete! 🎉");
+        titleLabel.setFont(UITheme.getTitleFont(32));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Stats panel
+        JPanel statsPanel = new JPanel();
+        statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
+        statsPanel.setOpaque(false);
+        statsPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
+        
+        JLabel finalScoreLabel = createStatRow("Final Score:", String.valueOf(score));
+        JLabel timeDisplayLabel = createStatRow("Time:", String.format("%d seconds", timeSeconds));
+        JLabel bonusLabel = createStatRow("Time Bonus:", "+" + timeBonus);
+        
+        statsPanel.add(finalScoreLabel);
+        statsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        statsPanel.add(timeDisplayLabel);
+        statsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        statsPanel.add(bonusLabel);
         
         // Check for high score
         boolean isHighScore = highScoreManager.isHighScore(score);
+        
         if (isHighScore) {
-            String playerName = JOptionPane.showInputDialog(
-                this,
-                message + "\n\nYou achieved a HIGH SCORE!\nEnter your name:",
-                "Level Complete",
-                JOptionPane.INFORMATION_MESSAGE
-            );
+            JLabel highScoreLabel = new JLabel("🏆 HIGH SCORE! 🏆");
+            highScoreLabel.setFont(UITheme.getHeadingFont(20));
+            highScoreLabel.setForeground(UITheme.WARNING_YELLOW_LIGHT);
+            highScoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            statsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            statsPanel.add(highScoreLabel);
             
-            if (playerName != null && !playerName.trim().isEmpty()) {
-                PlayerScore playerScore = new PlayerScore(playerName.trim(), score, levelName);
+            // Name input
+            JTextField nameField = new JTextField(15);
+            nameField.setFont(UITheme.getBodyFont(14));
+            nameField.setMaximumSize(new Dimension(250, 35));
+            nameField.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+            statsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+            statsPanel.add(new JLabel("Enter your name:"));
+            statsPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+            statsPanel.add(nameField);
+            
+            // Buttons
+            JPanel buttonPanel = new JPanel(new FlowLayout());
+            buttonPanel.setOpaque(false);
+            
+            JButton submitButton = new JButton("Submit Score");
+            UITheme.styleModernButton(submitButton, UITheme.PRIMARY_BLUE, 40);
+            submitButton.addActionListener(e -> {
+                String playerName = nameField.getText().trim();
+                if (!playerName.isEmpty()) {
+                    PlayerScore playerScore = new PlayerScore(playerName, score, levelName);
                 highScoreManager.addScore(playerScore);
-            }
+                    dialog.dispose();
+                }
+            });
+            
+            JButton skipButton = new JButton("Skip");
+            UITheme.styleModernButton(skipButton, UITheme.GRAY_500, 40);
+            skipButton.addActionListener(e -> dialog.dispose());
+            
+            buttonPanel.add(submitButton);
+            buttonPanel.add(Box.createRigidArea(new Dimension(15, 0)));
+            buttonPanel.add(skipButton);
+            statsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            statsPanel.add(buttonPanel);
         } else {
-            JOptionPane.showMessageDialog(this, message, "Level Complete", 
-                JOptionPane.INFORMATION_MESSAGE);
+            JLabel unlockLabel = new JLabel("New levels may have been unlocked!");
+            unlockLabel.setFont(UITheme.getBodyFont(14));
+            unlockLabel.setForeground(Color.WHITE);
+            unlockLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            statsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            statsPanel.add(unlockLabel);
+            
+            JButton okButton = new JButton("Continue");
+            UITheme.styleModernButton(okButton, UITheme.PRIMARY_BLUE, 40);
+            okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            okButton.addActionListener(e -> dialog.dispose());
+            statsPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+            statsPanel.add(okButton);
         }
         
-        returnToLevelSelection();
+        mainPanel.add(titleLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        mainPanel.add(statsPanel);
+        
+        dialog.add(mainPanel);
+        return dialog;
+    }
+    
+    private JLabel createStatRow(String label, String value) {
+        JLabel rowLabel = new JLabel(label + "  " + value);
+        rowLabel.setFont(UITheme.getHeadingFont(16));
+        rowLabel.setForeground(Color.WHITE);
+        rowLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return rowLabel;
     }
     
     private void returnToLevelSelection() {
@@ -450,17 +666,18 @@ public class GameScreen extends JFrame {
      * Custom panel for displaying game images with markers
      */
     private class ImagePanel extends JPanel {
-        private BufferedImage image;
-        private List<Point> markers;
+        private final BufferedImage image;
+        private final List<Point> markers;
         private Point hintPoint;
-        private boolean isLeftImage;
+        private final boolean isLeftImage;
         
         public ImagePanel(String imagePath, boolean isLeftImage) {
             this.isLeftImage = isLeftImage;
             this.markers = new ArrayList<>();
             this.image = loadImage(imagePath);
             setBackground(Color.WHITE);
-            setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+            setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
         }
         
         private BufferedImage loadImage(String imagePath) {
@@ -468,14 +685,17 @@ public class GameScreen extends JFrame {
                 // Try to load the image from the classpath
                 java.io.InputStream inputStream = getClass().getClassLoader().getResourceAsStream(imagePath);
                 if (inputStream != null) {
+                    try {
                     BufferedImage img = ImageIO.read(inputStream);
-                    inputStream.close();
                     if (img != null) {
                         return img;
+                        }
+                    } finally {
+                        inputStream.close();
                     }
                 }
                 System.out.println("Could not load image: " + imagePath);
-            } catch (Exception e) {
+            } catch (java.io.IOException e) {
                 System.err.println("Error loading image " + imagePath + ": " + e.getMessage());
             }
             // Fall back to placeholder if image loading fails
@@ -539,35 +759,78 @@ public class GameScreen extends JFrame {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-                               RenderingHints.VALUE_ANTIALIAS_ON);
+            Graphics2D g2d = (Graphics2D) g.create();
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            
+            // Draw shadow for image panel
+            UITheme.drawShadow(g2d, 4, 4, IMAGE_WIDTH - 8, IMAGE_HEIGHT - 8, 5);
+            
+            // Draw white background
+            g2d.setColor(Color.WHITE);
+            g2d.fillRoundRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, 12, 12);
             
             // Draw image
             if (image != null) {
+                g2d.setClip(new java.awt.geom.RoundRectangle2D.Float(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, 12, 12));
                 g2d.drawImage(image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, this);
+                g2d.setClip(null);
             }
             
-            // Draw found markers
-            g2d.setColor(new Color(0, 255, 0, 150));
-            g2d.setStroke(new BasicStroke(3));
+            // Draw border
+            g2d.setStroke(new BasicStroke(2.5f));
+            g2d.setColor(UITheme.GRAY_200);
+            g2d.drawRoundRect(1, 1, IMAGE_WIDTH - 3, IMAGE_HEIGHT - 3, 12, 12);
+            
+            // Draw found markers with enhanced visuals
             for (Point marker : markers) {
                 int x = marker.x;
                 int y = marker.y;
-                g2d.drawOval(x - 20, y - 20, 40, 40);
-                g2d.drawLine(x - 15, y, x + 15, y);
-                g2d.drawLine(x, y - 15, x, y + 15);
+                int radius = 25;
+                
+                // Outer glow
+                g2d.setColor(UITheme.withAlpha(UITheme.SUCCESS_GREEN, 0.3f));
+                g2d.fillOval(x - radius - 5, y - radius - 5, (radius + 5) * 2, (radius + 5) * 2);
+                
+                // Middle ring
+                g2d.setColor(UITheme.withAlpha(UITheme.SUCCESS_GREEN, 0.6f));
+                g2d.setStroke(new BasicStroke(3f));
+                g2d.drawOval(x - radius, y - radius, radius * 2, radius * 2);
+                
+                // Inner circle
+                g2d.setColor(UITheme.SUCCESS_GREEN);
+                g2d.fillOval(x - 12, y - 12, 24, 24);
+                
+                // Checkmark
+                g2d.setColor(Color.WHITE);
+                g2d.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2d.drawLine(x - 7, y, x - 2, y + 5);
+                g2d.drawLine(x - 2, y + 5, x + 7, y - 5);
             }
             
-            // Draw hint
+            // Draw hint with pulsing effect
             if (hintPoint != null) {
-                g2d.setColor(new Color(255, 255, 0, 200));
-                g2d.setStroke(new BasicStroke(4));
                 int x = hintPoint.x;
                 int y = hintPoint.y;
-                g2d.drawOval(x - 25, y - 25, 50, 50);
+                long time = System.currentTimeMillis() % 1000;
+                float pulse = (float)(0.5 + 0.5 * Math.sin(time * 0.01));
+                
+                // Outer pulsing circle
+                int outerRadius = (int)(35 + pulse * 10);
+                g2d.setColor(UITheme.withAlpha(UITheme.WARNING_YELLOW, 0.4f * pulse));
+                g2d.fillOval(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
+                
+                // Middle ring
+                g2d.setColor(UITheme.WARNING_YELLOW);
+                g2d.setStroke(new BasicStroke(4f));
                 g2d.drawOval(x - 30, y - 30, 60, 60);
+                
+                // Inner circle
+                g2d.setColor(UITheme.WARNING_YELLOW_LIGHT);
+                g2d.fillOval(x - 15, y - 15, 30, 30);
             }
+            
+            g2d.dispose();
         }
     }
 }

@@ -1,13 +1,30 @@
 package com.spotdifference.ui;
 
-import com.spotdifference.manager.HighScoreManager;
-import com.spotdifference.model.PlayerScore;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.util.LinkedList;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.util.LinkedList;
+
+import com.spotdifference.manager.HighScoreManager;
+import com.spotdifference.model.PlayerScore;
 
 /**
  * High Scores GUI - Displays the leaderboard using LinkedList
@@ -17,8 +34,8 @@ public class HighScoresFrame extends JFrame {
     private static final int WINDOW_WIDTH = 700;
     private static final int WINDOW_HEIGHT = 600;
     
-    private JFrame parentFrame;
-    private HighScoreManager highScoreManager;
+    private final JFrame parentFrame;
+    private final HighScoreManager highScoreManager;
     
     public HighScoresFrame(JFrame parentFrame) {
         this.parentFrame = parentFrame;
@@ -45,15 +62,31 @@ public class HighScoresFrame extends JFrame {
     
     private void createComponents() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(248, 250, 252));
+        mainPanel.setBackground(UITheme.GRAY_50);
         
-        // Modern Header
-        JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(234, 179, 8));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
+        // Modern Header with gradient
+        JPanel headerPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                GradientPaint gradient = UITheme.createGradient(
+                    getWidth(), getHeight(),
+                    UITheme.WARNING_YELLOW,
+                    UITheme.WARNING_YELLOW_DARK
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
+            }
+        };
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(35, 30, 35, 30));
         
-        JLabel titleLabel = new JLabel("High Scores Leaderboard");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        JLabel titleLabel = new JLabel("★ High Scores Leaderboard");
+        titleLabel.setFont(UITheme.getTitleFont(32));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
         
@@ -62,28 +95,18 @@ public class HighScoresFrame extends JFrame {
         
         // Modern bottom panel
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setBackground(new Color(241, 245, 249));
+        bottomPanel.setBackground(UITheme.GRAY_100);
         bottomPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(226, 232, 240)),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            BorderFactory.createMatteBorder(1, 0, 0, 0, UITheme.GRAY_200),
+            BorderFactory.createEmptyBorder(25, 25, 25, 25)
         ));
         
         JButton backButton = new JButton("← Back to Main Menu");
-        backButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        backButton.setBackground(new Color(100, 116, 139));
-        backButton.setForeground(Color.WHITE);
-        backButton.setFocusPainted(false);
-        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        backButton.setBorder(BorderFactory.createEmptyBorder(12, 24, 12, 24));
+        UITheme.styleModernButton(backButton, UITheme.GRAY_500, 45);
         backButton.addActionListener(e -> returnToMainMenu());
         
         JButton clearButton = new JButton("Clear All Scores");
-        clearButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        clearButton.setBackground(new Color(239, 68, 68));
-        clearButton.setForeground(Color.WHITE);
-        clearButton.setFocusPainted(false);
-        clearButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        clearButton.setBorder(BorderFactory.createEmptyBorder(12, 24, 12, 24));
+        UITheme.styleModernButton(clearButton, UITheme.DANGER_RED, 45);
         clearButton.addActionListener(e -> clearScores());
         
         bottomPanel.add(backButton);
@@ -99,8 +122,8 @@ public class HighScoresFrame extends JFrame {
     
     private JPanel createScoresTable() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(255, 255, 255));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
+        panel.setBackground(UITheme.BG_CARD);
+        panel.setBorder(BorderFactory.createEmptyBorder(40, 50, 40, 50));
         
         // Column names
         String[] columnNames = {"Rank", "Player", "Score", "Level", "Date"};
@@ -118,11 +141,12 @@ public class HighScoresFrame extends JFrame {
         
         // Populate table
         if (scores.isEmpty()) {
-            // Show empty message
-            JLabel emptyLabel = new JLabel("No high scores yet. Start playing!");
-            emptyLabel.setFont(new Font("Arial", Font.ITALIC, 18));
-            emptyLabel.setForeground(Color.GRAY);
+            // Show empty message with better styling
+            JLabel emptyLabel = new JLabel("No high scores yet. Start playing! 🎮");
+            emptyLabel.setFont(UITheme.getHeadingFont(20));
+            emptyLabel.setForeground(UITheme.TEXT_SECONDARY);
             emptyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            emptyLabel.setBorder(BorderFactory.createEmptyBorder(60, 0, 60, 0));
             panel.add(emptyLabel, BorderLayout.CENTER);
             return panel;
         }
@@ -130,7 +154,7 @@ public class HighScoresFrame extends JFrame {
         int rank = 1;
         for (PlayerScore score : scores) {
             Object[] row = {
-                "#" + rank,
+                rank == 1 ? "🥇" : rank == 2 ? "🥈" : rank == 3 ? "🥉" : "#" + rank,
                 score.getPlayerName(),
                 score.getScore() + " pts",
                 score.getLevelName(),
@@ -141,40 +165,93 @@ public class HighScoresFrame extends JFrame {
         }
         
         // Create modern table
-        JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        table.setRowHeight(40);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(37, 99, 235));
+        JTable table = new JTable(model) {
+            @Override
+            public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                
+                // Alternate row colors
+                if (!isRowSelected(row)) {
+                    c.setBackground(row % 2 == 0 ? UITheme.BG_CARD : UITheme.GRAY_50);
+                }
+                
+                // Highlight top 3
+                switch (row) {
+                    case 0:
+                        c.setBackground(UITheme.withAlpha(UITheme.WARNING_YELLOW_LIGHT, 0.3f));
+                        break;
+                    case 1:
+                        c.setBackground(UITheme.withAlpha(UITheme.GRAY_200, 0.5f));
+                        break;
+                    case 2:
+                        c.setBackground(UITheme.withAlpha(new Color(205, 127, 50), 0.3f));
+                        break;
+                    default:
+                        break;
+                }
+                
+                return c;
+            }
+        };
+        
+        table.setFont(UITheme.getBodyFont(14));
+        table.setRowHeight(45);
+        table.getTableHeader().setFont(UITheme.getButtonFont(14));
+        table.getTableHeader().setBackground(UITheme.PRIMARY_BLUE);
         table.getTableHeader().setForeground(Color.WHITE);
-        table.setSelectionBackground(new Color(219, 234, 254));
-        table.setGridColor(new Color(226, 232, 240));
+        table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getWidth(), 45));
+        table.setSelectionBackground(UITheme.withAlpha(UITheme.PRIMARY_BLUE_LIGHT, 0.3f));
+        table.setSelectionForeground(UITheme.TEXT_PRIMARY);
+        table.setGridColor(UITheme.GRAY_200);
+        table.setShowGrid(true);
+        table.setIntercellSpacing(new Dimension(0, 1));
+        
+        // Custom header renderer
+        table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                c.setFont(UITheme.getButtonFont(14));
+                c.setForeground(Color.WHITE);
+                c.setBackground(UITheme.PRIMARY_BLUE);
+                ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
+                return c;
+            }
+        });
         
         // Center align all cells
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
+                c.setFont(UITheme.getBodyFont(14));
+                return c;
+            }
+        };
+        
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
         
         // Column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(60);
-        table.getColumnModel().getColumn(1).setPreferredWidth(150);
-        table.getColumnModel().getColumn(2).setPreferredWidth(100);
-        table.getColumnModel().getColumn(3).setPreferredWidth(150);
-        table.getColumnModel().getColumn(4).setPreferredWidth(140);
+        table.getColumnModel().getColumn(0).setPreferredWidth(70);
+        table.getColumnModel().getColumn(1).setPreferredWidth(160);
+        table.getColumnModel().getColumn(2).setPreferredWidth(110);
+        table.getColumnModel().getColumn(3).setPreferredWidth(160);
+        table.getColumnModel().getColumn(4).setPreferredWidth(150);
         
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+        scrollPane.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(UITheme.GRAY_200, 2),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2)
+        ));
+        scrollPane.getViewport().setBackground(UITheme.BG_CARD);
+        scrollPane.setBackground(UITheme.BG_CARD);
         
         panel.add(scrollPane, BorderLayout.CENTER);
-        
-        // Info label
-        JLabel infoLabel = new JLabel("Data Structure: LinkedList - Demonstrates sorted insertion and traversal");
-        infoLabel.setFont(new Font("Arial", Font.ITALIC, 11));
-        infoLabel.setForeground(Color.GRAY);
-        infoLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        panel.add(infoLabel, BorderLayout.SOUTH);
         
         return panel;
     }
