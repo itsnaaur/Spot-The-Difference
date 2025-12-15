@@ -124,7 +124,7 @@ public class LevelSelectionFrame extends JFrame {
             BorderFactory.createEmptyBorder(25, 25, 25, 25)
         ));
         
-        JButton backButton = new JButton("← Back to Main Menu");
+        JButton backButton = new JButton("Back to Main Menu");
         UITheme.styleModernButton(backButton, UITheme.GRAY_500, 45);
         backButton.addActionListener(e -> returnToMainMenu());
         
@@ -172,7 +172,7 @@ public class LevelSelectionFrame extends JFrame {
         nameLabel.setForeground(UITheme.TEXT_PRIMARY);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Level difficulty rating - using text instead of stars
+        // Difficulty label + visual rating
         String[] difficultyText = {"Easy", "Medium", "Hard", "Expert", "Master"};
         Color[] difficultyColors = {
             UITheme.SUCCESS_GREEN,
@@ -181,11 +181,44 @@ public class LevelSelectionFrame extends JFrame {
             new Color(255, 87, 34),
             UITheme.DANGER_RED
         };
-        String difficultyRating = difficultyText[levelData.getDifficulty() - 1];
+        int difficultyIndex = levelData.getDifficulty() - 1;
+        String difficultyRating = difficultyText[difficultyIndex];
+
         JLabel difficultyLabel = new JLabel("Difficulty: " + difficultyRating);
         difficultyLabel.setFont(UITheme.getButtonFont(13));
-        difficultyLabel.setForeground(difficultyColors[levelData.getDifficulty() - 1]);
+        difficultyLabel.setForeground(difficultyColors[difficultyIndex]);
         difficultyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Star-like visual rating (drawn shapes, no Unicode stars)
+        JPanel ratingPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                int totalStars = 5;
+                int filledStars = Math.min(Math.max(levelData.getDifficulty(), 1), totalStars);
+                int size = 10;
+                int gap = 8;
+                int startX = (getWidth() - (totalStars * size + (totalStars - 1) * gap)) / 2;
+                int y = getHeight() / 2 - size / 2;
+
+                for (int i = 0; i < totalStars; i++) {
+                    if (i < filledStars) {
+                        g2d.setColor(difficultyColors[difficultyIndex]);
+                    } else {
+                        g2d.setColor(UITheme.GRAY_400);
+                    }
+                    g2d.fillOval(startX + i * (size + gap), y, size, size);
+                }
+
+                g2d.dispose();
+            }
+        };
+        ratingPanel.setOpaque(false);
+        ratingPanel.setPreferredSize(new Dimension(120, 18));
+        ratingPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         JLabel differencesLabel = new JLabel(levelData.getTotalDifferences() + " differences to find");
         differencesLabel.setFont(UITheme.getBodyFont(12));
@@ -213,13 +246,15 @@ public class LevelSelectionFrame extends JFrame {
                 g2d.dispose();
             }
         };
-        statusLabel.setFont(UITheme.getButtonFont(10));
+        statusLabel.setFont(UITheme.getButtonFont(11));
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         statusLabel.setOpaque(false);
-        statusLabel.setPreferredSize(new Dimension(120, 28));
+        // Extra padding so labels like "READY TO PLAY" / "LOCKED" have breathing room
+        // (a bit wider so the text doesn't touch the rounded edges)
+        statusLabel.setPreferredSize(new Dimension(180, 34));
         
         if (completed) {
-            statusLabel.setText("✓ COMPLETED");
+            statusLabel.setText("COMPLETED");
             statusLabel.setForeground(Color.WHITE);
             statusLabel.setBackground(UITheme.SUCCESS_GREEN);
         } else if (unlocked) {
@@ -227,13 +262,13 @@ public class LevelSelectionFrame extends JFrame {
             statusLabel.setForeground(Color.WHITE);
             statusLabel.setBackground(UITheme.PRIMARY_BLUE);
         } else {
-            statusLabel.setText("🔒 LOCKED");
+            statusLabel.setText("LOCKED");
             statusLabel.setForeground(Color.WHITE);
             statusLabel.setBackground(UITheme.GRAY_400);
         }
         
-        // Modern play button
-        JButton playButton = new JButton(unlocked ? "▶ Play Level" : "🔒 Locked") {
+        // Modern play button (plain text, no emoji)
+        JButton playButton = new JButton(unlocked ? "Play Level" : "Locked") {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
@@ -296,6 +331,8 @@ public class LevelSelectionFrame extends JFrame {
         card.add(nameLabel);
         card.add(Box.createRigidArea(new Dimension(0, 12)));
         card.add(difficultyLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 4)));
+        card.add(ratingPanel);
         card.add(Box.createRigidArea(new Dimension(0, 8)));
         card.add(differencesLabel);
         card.add(Box.createRigidArea(new Dimension(0, 15)));

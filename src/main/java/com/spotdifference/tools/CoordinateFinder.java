@@ -84,19 +84,19 @@ public class CoordinateFinder extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setOpaque(false);
         
-        JButton loadButton = new JButton("📁 Load Images");
+        JButton loadButton = new JButton("Load Images");
         loadButton.setFont(new Font("Arial", Font.BOLD, 14));
         loadButton.addActionListener(e -> loadImages());
         
-        JButton clearButton = new JButton("🗑️ Clear All");
+        JButton clearButton = new JButton("Clear All");
         clearButton.setFont(new Font("Arial", Font.BOLD, 14));
         clearButton.addActionListener(e -> clearPoints());
         
-        JButton printButton = new JButton("📋 Print Code");
+        JButton printButton = new JButton("Print Code");
         printButton.setFont(new Font("Arial", Font.BOLD, 14));
         printButton.addActionListener(e -> printCode());
         
-        JButton undoButton = new JButton("↶ Undo Last");
+        JButton undoButton = new JButton("Undo Last");
         undoButton.setFont(new Font("Arial", Font.BOLD, 14));
         undoButton.addActionListener(e -> undoLast());
         

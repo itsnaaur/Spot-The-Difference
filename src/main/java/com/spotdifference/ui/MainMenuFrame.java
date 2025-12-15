@@ -50,22 +50,19 @@ public class MainMenuFrame extends JFrame {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                // Create gradient background
                 GradientPaint gradient = UITheme.createGradient(
                     getWidth(), getHeight(),
-                    UITheme.GRAY_50,
-                    UITheme.BG_PANEL
+                    UITheme.GRAY_100,
+                    UITheme.GRAY_900
                 );
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
-                
                 g2d.dispose();
             }
         };
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(80, 100, 80, 100));
         
-        // Title with enhanced styling and shadow effect
         JLabel titleLabel = new JLabel("Spot the Difference") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -73,44 +70,37 @@ public class MainMenuFrame extends JFrame {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 
-                // Draw text shadow
-                g2d.setColor(new Color(0, 0, 0, 20));
+                g2d.setColor(new Color(0, 0, 0, 100));
                 g2d.setFont(getFont());
                 g2d.drawString(getText(), 3, getHeight() - 3);
                 
-                // Draw main text
                 super.paintComponent(g);
                 g2d.dispose();
             }
         };
-        titleLabel.setFont(UITheme.getTitleFont(48));
-        titleLabel.setForeground(UITheme.PRIMARY_BLUE);
+        titleLabel.setFont(UITheme.getTitleFont(46));
+        titleLabel.setForeground(UITheme.PRIMARY_BLUE_LIGHT);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Subtitle with modern font
         JLabel subtitleLabel = new JLabel("Data Structures Showcase Game");
         subtitleLabel.setFont(UITheme.getBodyFont(18));
         subtitleLabel.setForeground(UITheme.TEXT_SECONDARY);
         subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Add decorative line
         JSeparator separator = new JSeparator();
-        separator.setPreferredSize(new Dimension(200, 2));
-        separator.setBackground(UITheme.PRIMARY_BLUE_LIGHT);
-        separator.setForeground(UITheme.PRIMARY_BLUE_LIGHT);
+        separator.setPreferredSize(new Dimension(220, 2));
+        separator.setBackground(UITheme.PRIMARY_BLUE_DARK);
+        separator.setForeground(UITheme.PRIMARY_BLUE_DARK);
         separator.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Modern buttons with enhanced styling
-        JButton startButton = createStyledButton("▶ Start Game", UITheme.SUCCESS_GREEN, 60);
-        JButton highScoresButton = createStyledButton("★ High Scores", UITheme.PRIMARY_BLUE, 60);
-        JButton exitButton = createStyledButton("✕ Exit", UITheme.DANGER_RED, 60);
+        JButton startButton = createStyledButton("Start Game", UITheme.SUCCESS_GREEN, 60);
+        JButton highScoresButton = createStyledButton("High Scores", UITheme.PRIMARY_BLUE, 60);
+        JButton exitButton = createStyledButton("Exit", UITheme.DANGER_RED, 60);
         
-        // Button actions
         startButton.addActionListener(e -> openLevelSelection());
         highScoresButton.addActionListener(e -> openHighScores());
         exitButton.addActionListener(e -> System.exit(0));
         
-        // Add components with spacing
         mainPanel.add(Box.createVerticalGlue());
         mainPanel.add(titleLabel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -135,19 +125,15 @@ public class MainMenuFrame extends JFrame {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                // Draw shadow
                 UITheme.drawShadow(g2d, 2, 2, getWidth() - 4, getHeight() - 4, 3);
                 
-                // Draw rounded rectangle background
                 g2d.setColor(getBackground());
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
                 
-                // Draw border
                 g2d.setStroke(new BasicStroke(1.5f));
-                g2d.setColor(UITheme.darkenColor(getBackground(), 0.1f));
+                g2d.setColor(UITheme.darkenColor(getBackground(), 0.12f));
                 g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
                 
-                // Draw text
                 g2d.setColor(getForeground());
                 FontMetrics fm = g2d.getFontMetrics(getFont());
                 int textX = (getWidth() - fm.stringWidth(getText())) / 2;
@@ -161,31 +147,6 @@ public class MainMenuFrame extends JFrame {
         UITheme.styleModernButton(button, bgColor, height);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setMaximumSize(new Dimension(360, height));
-        
-        // Enhanced hover effect
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(UITheme.lightenColor(bgColor, 0.15f));
-                button.repaint();
-            }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor);
-                button.repaint();
-            }
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                button.setBackground(UITheme.darkenColor(bgColor, 0.15f));
-                button.repaint();
-            }
-            @Override
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                button.setBackground(bgColor);
-                button.repaint();
-            }
-        });
-        
         return button;
     }
     
@@ -201,4 +162,3 @@ public class MainMenuFrame extends JFrame {
         this.setVisible(false);
     }
 }
-

@@ -47,8 +47,10 @@ import com.spotdifference.model.PlayerScore;
  */
 public class GameScreen extends JFrame {
     private static final int WINDOW_WIDTH = 1200;
-    private static final int WINDOW_HEIGHT = 700;
+    // Taller game window so full-size images + HUD fit comfortably
+    private static final int WINDOW_HEIGHT = 820;
     private static final int IMAGE_WIDTH = 550;
+    // Original image height (1:1 with your image coordinates for accurate clicks)
     private static final int IMAGE_HEIGHT = 500;
     
     private final LevelSelectionFrame parentFrame;
@@ -128,13 +130,8 @@ public class GameScreen extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(UITheme.BG_PANEL);
         
-        // Top panel with level info and controls
         JPanel topPanel = createTopPanel();
-        
-        // Center panel with images
         JPanel centerPanel = createCenterPanel();
-        
-        // Bottom panel with stats
         JPanel bottomPanel = createBottomPanel();
         
         mainPanel.add(topPanel, BorderLayout.NORTH);
@@ -166,47 +163,41 @@ public class GameScreen extends JFrame {
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createEmptyBorder(22, 30, 22, 30));
         
-        // Left: Level name with modern styling
         JLabel levelLabel = new JLabel("Playing: " + levelName);
         levelLabel.setFont(UITheme.getHeadingFont(22));
         levelLabel.setForeground(Color.WHITE);
         
-        // Center: Action buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         buttonPanel.setOpaque(false);
         
-        hintButton = createGameButton("💡 Hint (" + hintManager.getHintsRemaining() + ")", 
+        hintButton = createGameButton("Hint (" + hintManager.getHintsRemaining() + ")", 
                                       UITheme.WARNING_YELLOW);
         hintButton.addActionListener(e -> useHint());
         
-        undoButton = createGameButton("↶ Undo", UITheme.ACCENT_PURPLE);
+        undoButton = createGameButton("Undo", UITheme.ACCENT_PURPLE);
         undoButton.addActionListener(e -> undoLastMove());
         undoButton.setEnabled(false);
         
-        JButton pauseButton = createGameButton("⏸ Pause", UITheme.GRAY_500);
+        JButton pauseButton = createGameButton("Pause", UITheme.GRAY_500);
         pauseButton.addActionListener(e -> pauseGame());
         
         buttonPanel.add(hintButton);
         buttonPanel.add(undoButton);
         buttonPanel.add(pauseButton);
         
-        // Right: Differences remaining with modern badge
         differencesLabel = new JLabel() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                // Draw badge background
                 g2d.setColor(UITheme.WARNING_YELLOW_LIGHT);
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
                 
-                // Draw border
                 g2d.setStroke(new BasicStroke(2f));
                 g2d.setColor(UITheme.WARNING_YELLOW);
                 g2d.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 20, 20);
                 
-                // Draw text
                 g2d.setColor(UITheme.TEXT_PRIMARY);
                 FontMetrics fm = g2d.getFontMetrics(getFont());
                 int textX = (getWidth() - fm.stringWidth(getText())) / 2;
@@ -229,16 +220,17 @@ public class GameScreen extends JFrame {
     }
     
     private JPanel createCenterPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 25));
+        // Strict 1x2 grid so both images are always visible side by side
+        JPanel panel = new JPanel(new java.awt.GridLayout(1, 2, 30, 0));
         panel.setBackground(UITheme.BG_PANEL);
-        panel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+        // Slightly more top padding, modest bottom padding so full 550x500
+        // images sit cleanly above the stats bar without feeling cramped.
+        panel.setBorder(BorderFactory.createEmptyBorder(40, 25, 20, 25));
         
-        // Left image
         leftImagePanel = new ImagePanel(levelData.getImage1Path(), true);
         leftImagePanel.setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
         leftImagePanel.addMouseListener(new ImageClickListener());
         
-        // Right image
         rightImagePanel = new ImagePanel(levelData.getImage2Path(), false);
         rightImagePanel.setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
         rightImagePanel.addMouseListener(new ImageClickListener());
@@ -254,10 +246,10 @@ public class GameScreen extends JFrame {
         panel.setBackground(UITheme.GRAY_100);
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(1, 0, 0, 0, UITheme.GRAY_200),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+            BorderFactory.createEmptyBorder(16, 20, 16, 20)
         ));
         
-        scoreLabel = createStatLabel("Score: 0", UITheme.PRIMARY_BLUE);
+        scoreLabel = createStatLabel("Score: 0", UITheme.PRIMARY_BLUE_LIGHT);
         timeLabel = createStatLabel("Time: 00:00", UITheme.TEXT_SECONDARY);
         clicksLabel = createStatLabel("Clicks: 0", UITheme.TEXT_SECONDARY);
         
@@ -287,24 +279,17 @@ public class GameScreen extends JFrame {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
                 if (isEnabled()) {
-                    // Draw shadow
                     UITheme.drawShadow(g2d, 2, 2, getWidth() - 4, getHeight() - 4, 2);
-                    
-                    // Draw button background
                     g2d.setColor(getBackground());
                     g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                    
-                    // Draw border
                     g2d.setStroke(new BasicStroke(1.5f));
                     g2d.setColor(UITheme.darkenColor(getBackground(), 0.1f));
                     g2d.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 10, 10);
                 } else {
-                    // Disabled state
                     g2d.setColor(UITheme.GRAY_200);
                     g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
                 }
                 
-                // Draw text
                 g2d.setColor(isEnabled() ? getForeground() : UITheme.TEXT_DISABLED);
                 FontMetrics fm = g2d.getFontMetrics(getFont());
                 int textX = (getWidth() - fm.stringWidth(getText())) / 2;
@@ -318,7 +303,6 @@ public class GameScreen extends JFrame {
         UITheme.styleModernButton(button, bgColor, 38);
         button.setPreferredSize(new Dimension(button.getPreferredSize().width, 38));
         
-        // Enhanced hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 if (button.isEnabled()) {
@@ -328,7 +312,7 @@ public class GameScreen extends JFrame {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 if (button.isEnabled()) {
-                button.setBackground(bgColor);
+                    button.setBackground(bgColor);
                     button.repaint();
                 }
             }
@@ -355,9 +339,6 @@ public class GameScreen extends JFrame {
         timeLabel.setText(String.format("Time: %02d:%02d", minutes, seconds));
     }
     
-    /**
-     * Handles image clicks - demonstrates HashSet's O(1) checking
-     */
     private class ImageClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -365,14 +346,11 @@ public class GameScreen extends JFrame {
             clicksLabel.setText("Clicks: " + clicks);
             Point clickPoint = e.getPoint();
             
-            // Check if click matches a difference (HashSet operation)
             Difference foundDiff = differenceChecker.checkClick(clickPoint);
             
             if (foundDiff != null) {
-                // Correct click!
                 handleCorrectClick(foundDiff);
             } else {
-                // Wrong click - penalty
                 score = Math.max(0, score - 5);
                 updateScore();
             }
@@ -380,34 +358,25 @@ public class GameScreen extends JFrame {
     }
     
     private void handleCorrectClick(Difference difference) {
-        // Add to undo stack (Stack push operation)
         undoManager.pushMove(difference);
         undoButton.setEnabled(true);
         
-        // Remove from hint queue if present
         hintManager.removeDifference(difference);
         
-        // Add visual marker
         foundMarkers.add(difference.getLocation());
         leftImagePanel.addMarker(difference.getLocation());
         rightImagePanel.addMarker(difference.getLocation());
         
-        // Update score
         score += 100;
         updateScore();
         
-        // Update UI
         differencesLabel.setText(differenceChecker.getRemainingCount() + " remaining");
         
-        // Check if level complete
         if (differenceChecker.isLevelComplete()) {
             levelComplete();
         }
     }
     
-    /**
-     * Uses hint - demonstrates Queue's FIFO dequeue operation
-     */
     private void useHint() {
         if (!hintManager.hasHintsAvailable()) {
             JOptionPane.showMessageDialog(this, "No hints remaining!", 
@@ -415,20 +384,16 @@ public class GameScreen extends JFrame {
             return;
         }
         
-        // Get next hint from queue (Queue poll operation)
         currentHint = hintManager.getNextHint();
         if (currentHint != null) {
-            // Show hint temporarily
             leftImagePanel.showHint(currentHint.getLocation());
             rightImagePanel.showHint(currentHint.getLocation());
             
-            // Update button
             hintButton.setText("Hint (" + hintManager.getHintsRemaining() + ")");
             if (!hintManager.hasHintsAvailable()) {
                 hintButton.setEnabled(false);
             }
             
-            // Remove hint after 2 seconds
             if (hintTimer != null) {
                 hintTimer.stop();
             }
@@ -439,32 +404,23 @@ public class GameScreen extends JFrame {
             });
             hintTimer.start();
             
-            // Small score penalty
             score = Math.max(0, score - 20);
             updateScore();
         }
     }
     
-    /**
-     * Undoes last move - demonstrates Stack's LIFO pop operation
-     */
     private void undoLastMove() {
-        // Pop from undo stack (Stack pop operation)
         Difference lastDiff = undoManager.popMove();
         
         if (lastDiff != null) {
-            // Add back to difference checker
             differenceChecker.addDifference(lastDiff);
             
-            // Remove visual marker
             foundMarkers.remove(lastDiff.getLocation());
             leftImagePanel.removeMarker(lastDiff.getLocation());
             rightImagePanel.removeMarker(lastDiff.getLocation());
             
-            // Update UI
             differencesLabel.setText(differenceChecker.getRemainingCount() + " remaining");
             
-            // Score penalty for undo
             score = Math.max(0, score - 50);
             updateScore();
         }
@@ -513,15 +469,12 @@ public class GameScreen extends JFrame {
     private void levelComplete() {
         gameTimer.stop();
         
-        // Calculate time bonus
         long timeSeconds = (System.currentTimeMillis() - startTime) / 1000;
-        int timeBonus = Math.max(0, 500 - (int)timeSeconds * 2);
+        int timeBonus = Math.max(0, 500 - (int) timeSeconds * 2);
         score += timeBonus;
         
-        // Mark level as completed in graph
         progressionGraph.completeLevel(levelName);
         
-        // Create custom completion dialog with better styling
         JDialog completionDialog = createCompletionDialog(timeSeconds, timeBonus);
         completionDialog.setVisible(true);
         
@@ -554,13 +507,11 @@ public class GameScreen extends JFrame {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         
-        // Title
-        JLabel titleLabel = new JLabel("🎉 Level Complete! 🎉");
+        JLabel titleLabel = new JLabel("Level Complete!");
         titleLabel.setFont(UITheme.getTitleFont(32));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Stats panel
         JPanel statsPanel = new JPanel();
         statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
         statsPanel.setOpaque(false);
@@ -576,18 +527,16 @@ public class GameScreen extends JFrame {
         statsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         statsPanel.add(bonusLabel);
         
-        // Check for high score
         boolean isHighScore = highScoreManager.isHighScore(score);
         
         if (isHighScore) {
-            JLabel highScoreLabel = new JLabel("🏆 HIGH SCORE! 🏆");
+            JLabel highScoreLabel = new JLabel("NEW HIGH SCORE!");
             highScoreLabel.setFont(UITheme.getHeadingFont(20));
             highScoreLabel.setForeground(UITheme.WARNING_YELLOW_LIGHT);
             highScoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             statsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
             statsPanel.add(highScoreLabel);
             
-            // Name input
             JTextField nameField = new JTextField(15);
             nameField.setFont(UITheme.getBodyFont(14));
             nameField.setMaximumSize(new Dimension(250, 35));
@@ -598,7 +547,6 @@ public class GameScreen extends JFrame {
             statsPanel.add(Box.createRigidArea(new Dimension(0, 8)));
             statsPanel.add(nameField);
             
-            // Buttons
             JPanel buttonPanel = new JPanel(new FlowLayout());
             buttonPanel.setOpaque(false);
             
@@ -608,7 +556,7 @@ public class GameScreen extends JFrame {
                 String playerName = nameField.getText().trim();
                 if (!playerName.isEmpty()) {
                     PlayerScore playerScore = new PlayerScore(playerName, score, levelName);
-                highScoreManager.addScore(playerScore);
+                    highScoreManager.addScore(playerScore);
                     dialog.dispose();
                 }
             });
@@ -661,14 +609,11 @@ public class GameScreen extends JFrame {
         if (hintTimer != null) {
             hintTimer.stop();
         }
-        parentFrame.refresh(); // Refresh to show newly unlocked levels
+        parentFrame.refresh();
         parentFrame.setVisible(true);
         dispose();
     }
     
-    /**
-     * Custom panel for displaying game images with markers
-     */
     private class ImagePanel extends JPanel {
         private final BufferedImage image;
         private final List<Point> markers;
@@ -679,20 +624,20 @@ public class GameScreen extends JFrame {
             this.isLeftImage = isLeftImage;
             this.markers = new ArrayList<>();
             this.image = loadImage(imagePath);
-            setBackground(Color.WHITE);
-            setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+            // Let the parent background show through so we don't get any
+            // unwanted white behind or beside the image.
+            setOpaque(false);
             setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
         }
         
         private BufferedImage loadImage(String imagePath) {
             try {
-                // Try to load the image from the classpath
                 java.io.InputStream inputStream = getClass().getClassLoader().getResourceAsStream(imagePath);
                 if (inputStream != null) {
                     try {
-                    BufferedImage img = ImageIO.read(inputStream);
-                    if (img != null) {
-                        return img;
+                        BufferedImage img = ImageIO.read(inputStream);
+                        if (img != null) {
+                            return img;
                         }
                     } finally {
                         inputStream.close();
@@ -702,7 +647,6 @@ public class GameScreen extends JFrame {
             } catch (java.io.IOException e) {
                 System.err.println("Error loading image " + imagePath + ": " + e.getMessage());
             }
-            // Fall back to placeholder if image loading fails
             return createPlaceholderImage();
         }
         
@@ -711,24 +655,21 @@ public class GameScreen extends JFrame {
                                                  BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = img.createGraphics();
             
-            // Gradient background
             GradientPaint gradient = new GradientPaint(
-                0, 0, new Color(100, 150, 200),
-                IMAGE_WIDTH, IMAGE_HEIGHT, new Color(200, 150, 100)
+                0, 0, new Color(30, 64, 175),
+                IMAGE_WIDTH, IMAGE_HEIGHT, new Color(15, 23, 42)
             );
             g2d.setPaint(gradient);
             g2d.fillRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
             
-            // Add some shapes
-            g2d.setColor(new Color(255, 255, 255, 100));
+            g2d.setColor(new Color(255, 255, 255, 60));
             for (int i = 0; i < 10; i++) {
-                int x = (int)(Math.random() * IMAGE_WIDTH);
-                int y = (int)(Math.random() * IMAGE_HEIGHT);
-                int size = (int)(Math.random() * 100) + 50;
+                int x = (int) (Math.random() * IMAGE_WIDTH);
+                int y = (int) (Math.random() * IMAGE_HEIGHT);
+                int size = (int) (Math.random() * 100) + 50;
                 g2d.fillOval(x, y, size, size);
             }
             
-            // Text
             g2d.setColor(Color.WHITE);
             g2d.setFont(new Font("Arial", Font.BOLD, 30));
             String text = isLeftImage ? "Left Image" : "Right Image";
@@ -767,69 +708,48 @@ public class GameScreen extends JFrame {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             
-            // Draw shadow for image panel
-            UITheme.drawShadow(g2d, 4, 4, IMAGE_WIDTH - 8, IMAGE_HEIGHT - 8, 5);
-            
-            // Draw white background
-            g2d.setColor(Color.WHITE);
-            g2d.fillRoundRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, 12, 12);
-            
-            // Draw image
+            // Soft shadow only, no extra white frame so the image sits flush
+            UITheme.drawShadow(g2d, 4, 4, IMAGE_WIDTH - 8, IMAGE_HEIGHT - 8, 4);
+
             if (image != null) {
-                g2d.setClip(new java.awt.geom.RoundRectangle2D.Float(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, 12, 12));
                 g2d.drawImage(image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, this);
-                g2d.setClip(null);
             }
             
-            // Draw border
-            g2d.setStroke(new BasicStroke(2.5f));
-            g2d.setColor(UITheme.GRAY_200);
-            g2d.drawRoundRect(1, 1, IMAGE_WIDTH - 3, IMAGE_HEIGHT - 3, 12, 12);
-            
-            // Draw found markers with enhanced visuals
             for (Point marker : markers) {
                 int x = marker.x;
                 int y = marker.y;
                 int radius = 25;
                 
-                // Outer glow
                 g2d.setColor(UITheme.withAlpha(UITheme.SUCCESS_GREEN, 0.3f));
                 g2d.fillOval(x - radius - 5, y - radius - 5, (radius + 5) * 2, (radius + 5) * 2);
                 
-                // Middle ring
                 g2d.setColor(UITheme.withAlpha(UITheme.SUCCESS_GREEN, 0.6f));
                 g2d.setStroke(new BasicStroke(3f));
                 g2d.drawOval(x - radius, y - radius, radius * 2, radius * 2);
                 
-                // Inner circle
                 g2d.setColor(UITheme.SUCCESS_GREEN);
                 g2d.fillOval(x - 12, y - 12, 24, 24);
                 
-                // Checkmark
                 g2d.setColor(Color.WHITE);
                 g2d.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2d.drawLine(x - 7, y, x - 2, y + 5);
                 g2d.drawLine(x - 2, y + 5, x + 7, y - 5);
             }
             
-            // Draw hint with pulsing effect
             if (hintPoint != null) {
                 int x = hintPoint.x;
                 int y = hintPoint.y;
                 long time = System.currentTimeMillis() % 1000;
-                float pulse = (float)(0.5 + 0.5 * Math.sin(time * 0.01));
+                float pulse = (float) (0.5 + 0.5 * Math.sin(time * 0.01));
                 
-                // Outer pulsing circle
-                int outerRadius = (int)(35 + pulse * 10);
+                int outerRadius = (int) (35 + pulse * 10);
                 g2d.setColor(UITheme.withAlpha(UITheme.WARNING_YELLOW, 0.4f * pulse));
                 g2d.fillOval(x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2);
                 
-                // Middle ring
                 g2d.setColor(UITheme.WARNING_YELLOW);
                 g2d.setStroke(new BasicStroke(4f));
                 g2d.drawOval(x - 30, y - 30, 60, 60);
                 
-                // Inner circle
                 g2d.setColor(UITheme.WARNING_YELLOW_LIGHT);
                 g2d.fillOval(x - 15, y - 15, 30, 30);
             }
@@ -838,4 +758,3 @@ public class GameScreen extends JFrame {
         }
     }
 }
-

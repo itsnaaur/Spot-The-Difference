@@ -62,9 +62,8 @@ public class HighScoresFrame extends JFrame {
     
     private void createComponents() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(UITheme.GRAY_50);
+        mainPanel.setBackground(UITheme.GRAY_100);
         
-        // Modern Header with gradient
         JPanel headerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -74,8 +73,8 @@ public class HighScoresFrame extends JFrame {
                 
                 GradientPaint gradient = UITheme.createGradient(
                     getWidth(), getHeight(),
-                    UITheme.WARNING_YELLOW,
-                    UITheme.WARNING_YELLOW_DARK
+                    UITheme.PRIMARY_BLUE_DARK,
+                    UITheme.PRIMARY_BLUE
                 );
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
@@ -85,15 +84,13 @@ public class HighScoresFrame extends JFrame {
         headerPanel.setOpaque(false);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(35, 30, 35, 30));
         
-        JLabel titleLabel = new JLabel("★ High Scores Leaderboard");
-        titleLabel.setFont(UITheme.getTitleFont(32));
+        JLabel titleLabel = new JLabel("High Scores");
+        titleLabel.setFont(UITheme.getTitleFont(30));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
         
-        // Table for scores
         JPanel tablePanel = createScoresTable();
         
-        // Modern bottom panel
         JPanel bottomPanel = new JPanel();
         bottomPanel.setBackground(UITheme.GRAY_100);
         bottomPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -101,7 +98,7 @@ public class HighScoresFrame extends JFrame {
             BorderFactory.createEmptyBorder(25, 25, 25, 25)
         ));
         
-        JButton backButton = new JButton("← Back to Main Menu");
+        JButton backButton = new JButton("Back to Main Menu");
         UITheme.styleModernButton(backButton, UITheme.GRAY_500, 45);
         backButton.addActionListener(e -> returnToMainMenu());
         
@@ -125,13 +122,9 @@ public class HighScoresFrame extends JFrame {
         panel.setBackground(UITheme.BG_CARD);
         panel.setBorder(BorderFactory.createEmptyBorder(40, 50, 40, 50));
         
-        // Column names
         String[] columnNames = {"Rank", "Player", "Score", "Level", "Date"};
-        
-        // Get scores from LinkedList
         LinkedList<PlayerScore> scores = highScoreManager.getHighScores();
         
-        // Create table model
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -139,10 +132,8 @@ public class HighScoresFrame extends JFrame {
             }
         };
         
-        // Populate table
         if (scores.isEmpty()) {
-            // Show empty message with better styling
-            JLabel emptyLabel = new JLabel("No high scores yet. Start playing! 🎮");
+            JLabel emptyLabel = new JLabel("No high scores yet. Start playing!");
             emptyLabel.setFont(UITheme.getHeadingFont(20));
             emptyLabel.setForeground(UITheme.TEXT_SECONDARY);
             emptyLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -153,8 +144,14 @@ public class HighScoresFrame extends JFrame {
         
         int rank = 1;
         for (PlayerScore score : scores) {
+            String rankLabel;
+            if (rank == 1) rankLabel = "#1";
+            else if (rank == 2) rankLabel = "#2";
+            else if (rank == 3) rankLabel = "#3";
+            else rankLabel = "#" + rank;
+            
             Object[] row = {
-                rank == 1 ? "🥇" : rank == 2 ? "🥈" : rank == 3 ? "🥉" : "#" + rank,
+                rankLabel,
                 score.getPlayerName(),
                 score.getScore() + " pts",
                 score.getLevelName(),
@@ -164,32 +161,20 @@ public class HighScoresFrame extends JFrame {
             rank++;
         }
         
-        // Create modern table
         JTable table = new JTable(model) {
             @Override
             public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
-                
-                // Alternate row colors
                 if (!isRowSelected(row)) {
-                    c.setBackground(row % 2 == 0 ? UITheme.BG_CARD : UITheme.GRAY_50);
+                    c.setBackground(row % 2 == 0 ? UITheme.BG_CARD : UITheme.GRAY_100);
                 }
-                
-                // Highlight top 3
-                switch (row) {
-                    case 0:
-                        c.setBackground(UITheme.withAlpha(UITheme.WARNING_YELLOW_LIGHT, 0.3f));
-                        break;
-                    case 1:
-                        c.setBackground(UITheme.withAlpha(UITheme.GRAY_200, 0.5f));
-                        break;
-                    case 2:
-                        c.setBackground(UITheme.withAlpha(new Color(205, 127, 50), 0.3f));
-                        break;
-                    default:
-                        break;
+                if (row == 0) {
+                    c.setBackground(UITheme.withAlpha(UITheme.WARNING_YELLOW_LIGHT, 0.18f));
+                } else if (row == 1) {
+                    c.setBackground(UITheme.withAlpha(UITheme.GRAY_200, 0.25f));
+                } else if (row == 2) {
+                    c.setBackground(UITheme.withAlpha(new Color(180, 83, 9), 0.2f));
                 }
-                
                 return c;
             }
         };
@@ -206,21 +191,6 @@ public class HighScoresFrame extends JFrame {
         table.setShowGrid(true);
         table.setIntercellSpacing(new Dimension(0, 1));
         
-        // Custom header renderer
-        table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setFont(UITheme.getButtonFont(14));
-                c.setForeground(Color.WHITE);
-                c.setBackground(UITheme.PRIMARY_BLUE);
-                ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
-                return c;
-            }
-        });
-        
-        // Center align all cells
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -231,12 +201,10 @@ public class HighScoresFrame extends JFrame {
                 return c;
             }
         };
-        
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
         
-        // Column widths
         table.getColumnModel().getColumn(0).setPreferredWidth(70);
         table.getColumnModel().getColumn(1).setPreferredWidth(160);
         table.getColumnModel().getColumn(2).setPreferredWidth(110);
@@ -252,7 +220,6 @@ public class HighScoresFrame extends JFrame {
         scrollPane.setBackground(UITheme.BG_CARD);
         
         panel.add(scrollPane, BorderLayout.CENTER);
-        
         return panel;
     }
     
@@ -279,4 +246,3 @@ public class HighScoresFrame extends JFrame {
         dispose();
     }
 }
-
