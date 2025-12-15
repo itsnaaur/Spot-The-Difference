@@ -1,7 +1,14 @@
 package com.spotdifference.manager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+
 import com.spotdifference.model.LevelNode;
-import java.util.*;
 
 /**
  * Function 6: Non-Linear Level Progression Map
@@ -29,7 +36,7 @@ public class LevelProgressionGraph {
         LevelNode space = new LevelNode("Space Scene", false);
         LevelNode fantasy = new LevelNode("Fantasy Scene", false);
         
-        // Define graph edges (level progression paths)
+        // Define graph edges (non-linear paths & unlock rules)
         // Beach unlocks Jungle and City
         beach.addAdjacentLevel(jungle);
         beach.addAdjacentLevel(city);

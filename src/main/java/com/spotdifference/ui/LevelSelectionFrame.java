@@ -40,6 +40,7 @@ public class LevelSelectionFrame extends JFrame {
     private final LevelProgressionGraph progressionGraph;
     
     public LevelSelectionFrame(JFrame parentFrame) {
+        // Graph drives locked/unlocked state; HashMap holds level data for cards
         this.parentFrame = parentFrame;
         this.levelManager = new LevelManager();
         this.progressionGraph = new LevelProgressionGraph();

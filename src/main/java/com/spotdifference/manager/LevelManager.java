@@ -14,6 +14,7 @@ public class LevelManager {
     private HashMap<String, LevelData> levels;
     
     public LevelManager() {
+        // HashMap: level name -> LevelData (fast O(1) lookup)
         this.levels = new HashMap<>();
         initializeLevels();
     }

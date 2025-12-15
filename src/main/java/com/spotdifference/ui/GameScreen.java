@@ -89,6 +89,7 @@ public class GameScreen extends JFrame {
         this.progressionGraph = progressionGraph;
         this.highScoreManager = new HighScoreManager();
         
+        // Wire up all data-structure-driven systems for this run
         initializeGame();
         initializeFrame();
         createComponents();
@@ -96,8 +97,11 @@ public class GameScreen extends JFrame {
     }
     
     private void initializeGame() {
+        // HashSet: remaining differences (O(1) contains/removal)
         this.differenceChecker = new DifferenceChecker(levelData.getDifferences());
+        // Stack: undo history (LIFO)
         this.undoManager = new UndoManager(5); // Max 5 undos
+        // Queue: hint order (FIFO)
         this.hintManager = new HintManager(levelData.getDifferences(), 3); // Max 3 hints
         this.score = 0;
         this.clicks = 0;
