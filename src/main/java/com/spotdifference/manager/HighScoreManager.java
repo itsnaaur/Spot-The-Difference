@@ -1,8 +1,14 @@
 package com.spotdifference.manager;
 
-import com.spotdifference.model.PlayerScore;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.LinkedList;
+
+import com.spotdifference.model.PlayerScore;
 
 /**
  * Function 5: High Score Leaderboard
@@ -27,20 +33,24 @@ public class HighScoreManager {
      * @return true if the score was added (made it to top 10), false otherwise
      */
     public boolean addScore(PlayerScore playerScore) {
-        // Find the correct position to insert (maintain sorted order)
+        // Find the correct position to insert (maintain sorted order - highest scores first)
+        // We want descending order: [100, 90, 80, 70, ...]
         int insertPosition = 0;
         for (PlayerScore score : highScores) {
-            if (playerScore.compareTo(score) < 0) {
-                // Current score is higher, keep looking
+            // compareTo returns negative if playerScore should come BEFORE score (i.e., playerScore is higher)
+            // compareTo returns positive if playerScore should come AFTER score (i.e., playerScore is lower)
+            if (playerScore.compareTo(score) > 0) {
+                // playerScore is lower than current score, so it should go after this position
                 insertPosition++;
             } else {
-                // Found the right position
+                // playerScore is higher or equal to current score, insert here
                 break;
             }
         }
         
         // Check if score qualifies for the leaderboard
-        if (insertPosition < MAX_SCORES) {
+        if (insertPosition < MAX_SCORES || highScores.size() < MAX_SCORES) {
+            // Insert at the correct position to maintain descending order (highest first)
             highScores.add(insertPosition, playerScore);
             
             // Remove excess scores if list exceeds maximum
@@ -48,13 +58,6 @@ public class HighScoreManager {
                 highScores.removeLast();
             }
             
-            saveScores();
-            return true;
-        }
-        
-        // If list isn't full yet, add the score
-        if (highScores.size() < MAX_SCORES) {
-            highScores.add(playerScore);
             saveScores();
             return true;
         }
@@ -135,6 +138,13 @@ public class HighScoreManager {
             try (ObjectInputStream ois = new ObjectInputStream(
                     new FileInputStream(SAVE_FILE))) {
                 highScores = (LinkedList<PlayerScore>) ois.readObject();
+                // Ensure scores are sorted in descending order (highest first)
+                // This fixes any existing files that might have been saved with incorrect order
+                highScores.sort((a, b) -> Integer.compare(b.getScore(), a.getScore()));
+                // Keep only top MAX_SCORES
+                while (highScores.size() > MAX_SCORES) {
+                    highScores.removeLast();
+                }
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("Error loading high scores: " + e.getMessage());
                 highScores = new LinkedList<>();
