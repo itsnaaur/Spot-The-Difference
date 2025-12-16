@@ -312,7 +312,7 @@ public class GameScreen extends JFrame {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 if (button.isEnabled()) {
-                    button.setBackground(bgColor);
+                button.setBackground(bgColor);
                     button.repaint();
                 }
             }
@@ -550,16 +550,25 @@ public class GameScreen extends JFrame {
             JPanel buttonPanel = new JPanel(new FlowLayout());
             buttonPanel.setOpaque(false);
             
-            JButton submitButton = new JButton("Submit Score");
-            UITheme.styleModernButton(submitButton, UITheme.PRIMARY_BLUE, 40);
-            submitButton.addActionListener(e -> {
+            // Create action to submit score (used by both button and Enter key)
+            Runnable submitAction = () -> {
                 String playerName = nameField.getText().trim();
                 if (!playerName.isEmpty()) {
                     PlayerScore playerScore = new PlayerScore(playerName, score, levelName);
                     highScoreManager.addScore(playerScore);
                     dialog.dispose();
                 }
-            });
+            };
+            
+            JButton submitButton = new JButton("Submit Score");
+            UITheme.styleModernButton(submitButton, UITheme.PRIMARY_BLUE, 40);
+            submitButton.addActionListener(e -> submitAction.run());
+            
+            // Add Enter key support to the text field
+            nameField.addActionListener(e -> submitAction.run());
+            
+            // Set submit button as default (highlighted, responds to Enter)
+            dialog.getRootPane().setDefaultButton(submitButton);
             
             JButton skipButton = new JButton("Skip");
             UITheme.styleModernButton(skipButton, UITheme.GRAY_500, 40);
@@ -570,6 +579,9 @@ public class GameScreen extends JFrame {
             buttonPanel.add(skipButton);
             statsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
             statsPanel.add(buttonPanel);
+            
+            // Request focus on the text field when dialog is shown
+            nameField.requestFocusInWindow();
         } else {
             JLabel unlockLabel = new JLabel("New levels may have been unlocked!");
             unlockLabel.setFont(UITheme.getBodyFont(14));
@@ -635,9 +647,9 @@ public class GameScreen extends JFrame {
                 java.io.InputStream inputStream = getClass().getClassLoader().getResourceAsStream(imagePath);
                 if (inputStream != null) {
                     try {
-                        BufferedImage img = ImageIO.read(inputStream);
-                        if (img != null) {
-                            return img;
+                    BufferedImage img = ImageIO.read(inputStream);
+                    if (img != null) {
+                        return img;
                         }
                     } finally {
                         inputStream.close();
@@ -710,7 +722,7 @@ public class GameScreen extends JFrame {
             
             // Soft shadow only, no extra white frame so the image sits flush
             UITheme.drawShadow(g2d, 4, 4, IMAGE_WIDTH - 8, IMAGE_HEIGHT - 8, 4);
-
+            
             if (image != null) {
                 g2d.drawImage(image, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, this);
             }

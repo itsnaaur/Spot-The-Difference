@@ -86,13 +86,16 @@ public class HighScoreManager {
     }
     
     /**
-     * Checks if a score would make it to the leaderboard
+     * Checks if a score is a NEW HIGH SCORE (beats the highest score in the leaderboard)
+     * This is different from qualifying for the leaderboard - this checks if it's the new #1
      */
     public boolean isHighScore(int score) {
-        if (highScores.size() < MAX_SCORES) {
-            return true;
+        if (highScores.isEmpty()) {
+            return true; // First score is always a high score
         }
-        return score > highScores.getLast().getScore();
+        // Only show "NEW HIGH SCORE!" if it beats the highest (first) score
+        int highestScore = highScores.getFirst().getScore();
+        return score > highestScore;
     }
     
     /**

@@ -117,14 +117,14 @@ public class UITheme {
         button.setBorderPainted(false);
         button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         button.setOpaque(true);
-
+        
         // Slightly pill-shaped with consistent height
         button.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 20, 8, 20));
         button.setPreferredSize(new java.awt.Dimension(
             button.getPreferredSize().width,
             height
         ));
-
+        
         // Subtle hover/press states (less aggressive so it looks cleaner)
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
